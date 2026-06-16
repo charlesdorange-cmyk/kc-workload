@@ -47,7 +47,10 @@
     overflow:hidden;text-overflow:ellipsis;cursor:pointer}
   .chip:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.cont{opacity:.82}
-  .chip .pbar{position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:5px 0 0 5px}
+  .chip .pbar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:5px 0 0 5px}
+  .chip .prio{display:inline-block;width:9px;height:9px;border-radius:50%;
+    margin-right:6px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+  .chip .cname{font-weight:600}
   .chip small{display:block;font-size:10px;opacity:.72;font-weight:600}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
@@ -118,9 +121,24 @@
 <script>
 const CONFIG={
   boardId:5098586993,
-  people:["Antoine B","Mathieu P","Kevin","Philippe","Fons","Antoine",
-          "Germain","Jan","Simon","Tapper","Ludovic","Jean Luc","Fred"],
-  workerUrl:"https://kc-monday.charles-dorange.workers.dev",
+  // Chaque personne : label = affiché dans la grille ; match = noms/emails
+  // possibles renvoyés par Monday (insensible à la casse).
+  people:[
+    {label:"Antoine B",  ids:["101235282"], match:["Antoine Ballot"]},
+    {label:"Mathieu P",  ids:["104764134"], match:["Mathieu Perramant"]},
+    {label:"Kevin L",    ids:["104764538"], match:["Kevin Le Guelvoud","kevin.leguelvoud@kc-lab.fr"]},
+    {label:"Philippe E", ids:["104763862"], match:["Philippe Echassoux","philippe echassoux"]},
+    {label:"Fons D",     ids:["104765010"], match:["Fons Dorrestijn","Fonz"]},
+    {label:"Antoine R",  ids:["44355583"],  match:["Antoine Rucard"]},
+    {label:"Germain R",  ids:["100629130"], match:["Germain Rucard"]},
+    {label:"Jan C",      ids:["56054463"],  match:["Jan Chudzik"]},
+    {label:"Simon B",    ids:["104844013"], match:["Simon Bird"]},
+    {label:"Ben T",      ids:["47130240"],  match:["Ben Tapper"]},
+    {label:"Ludovic B",  ids:["101234917"], match:["Ludovic Bosser","ludo.bosser@gmail.com"]},
+    {label:"Jean-Luc L", ids:["104791763"], match:["Jean-Luc Lacaze","Jean-Luc.Lacaze@kc-lab.fr"]},
+    {label:"Fred L",     ids:["104842886"], match:["Fred Le Gouallec","fred.legouallec@kc-lab.fr"]}
+  ],
+  workerUrl:"",
   refreshMs:5*60*1000
 };
 const STATUS_CLASS={"Working on it":"s-working","Done":"s-done","Stuck":"s-stuck",
@@ -160,17 +178,17 @@ function demoItems(){
     mk(2,"Ajustage Barrel et montage Barrel","Antoine B",0,1,"Working on it","Before next Sailing"),
     mk(3,"Préparation Flap","Antoine B",1,1,"Working on it","When possible"),
     mk(4,"Foil Belt Fairing","Antoine B",2,3,"Planned","Before Dock Out"),
-    mk(5,"Cockpit/siege","Kevin",0,4,"Working on it","Before next Sailing"),
+    mk(5,"Cockpit/siege","Kevin L",0,4,"Working on it","Before next Sailing"),
     mk(6,"Poncage Foil Arm","Mathieu P",2,3,"Planned","Nice to have"),
-    mk(7,"Foil Hinges+Seal Port","Philippe",1,1,"To be checked","Before Dock Out"),
-    mk(8,"Remontage Accastillage Mat","Fons",2,4,"Planned","When possible"),
-    mk(9,"Tente pour peinture Foil","Germain",2,2,"Planned","Nice to have"),
-    mk(10,"Mat 2","Ludovic",0,5,"Working on it","Before next Sailing"),
-    mk(11,"Batten Bridge","Jean Luc",2,3,"Planned","On hold"),
-    mk(12,"Foil Flap","Tapper",3,5,"Planned","Before Dock Out"),
-    mk(13,"Spray Rail adjust","Tapper",1,2,"To be checked","Nice to have"),
-    mk(14,"Coin de voile","Fred",0,1,"Working on it","Before Dock Out"),
-    mk(15,"Collage Slider Jib","Philippe",4,4,"Planned","When possible")
+    mk(7,"Foil Hinges+Seal Port","Philippe E",1,1,"To be checked","Before Dock Out"),
+    mk(8,"Remontage Accastillage Mat","Fons D",2,4,"Planned","When possible"),
+    mk(9,"Tente pour peinture Foil","Germain R",2,2,"Planned","Nice to have"),
+    mk(10,"Mat 2","Ludovic B",0,5,"Working on it","Before next Sailing"),
+    mk(11,"Batten Bridge","Jean-Luc L",2,3,"Planned","On hold"),
+    mk(12,"Foil Flap","Ben T",3,5,"Planned","Before Dock Out"),
+    mk(13,"Spray Rail adjust","Ben T",1,2,"To be checked","Nice to have"),
+    mk(14,"Coin de voile","Fred L",0,1,"Working on it","Before Dock Out"),
+    mk(15,"Collage Slider Jib","Philippe E",4,4,"Planned","When possible")
   ];
 }
 
@@ -179,17 +197,25 @@ function normalize(apiItems){
   for(const it of apiItems){
     const cv=it.column_values||it.columns||{};
     const get=k=>{const v=cv[k];return v==null?"":(typeof v==="string"?v:(v.text||""));};
-    const person=get("person"),status=get("status")||null,priority=get("priority")||null;
+    const personText=get("person");           // noms, séparés par virgule
+    const personIds=it.person_ids||[];         // IDs Monday (fiable)
+    const status=get("status")||null,priority=get("priority")||null;
     let start=null,end=null;
     const tl=get("timeline");
     if(tl&&tl.includes(" - ")){[start,end]=tl.split(" - ");}
     if(!start){const d=get("date0__1");if(d){start=d;end=d;}}
     const files=(it.files||cv.files_assets||[]).map(f=>({name:f.name,url:f.public_url||f.url}));
     RAW[it.id]={description:get("description"),how:get("how_we_fixed_it_"),files,url:it.url};
-    const persons=person?person.split(",").map(s=>s.trim()).filter(Boolean):[""];
-    for(const p of persons)
+    // 1) résout par ID (fiable), 2) complète par nom texte
+    let labels=personIds.map(resolveById).filter(Boolean);
+    if(!labels.length){
+      labels=personText.split(",").map(s=>resolvePerson(s.trim())).filter(Boolean);
+    }
+    labels=[...new Set(labels)];
+    for(const p of labels){
       out.push({id:it.id,name:it.name,person:p,start,end,status,priority,url:it.url,
         files,description:get("description"),how:get("how_we_fixed_it_")});
+    }
   }
   return out;
 }
@@ -208,10 +234,23 @@ async function load(){
 
 function statusClass(s){return STATUS_CLASS[s]||"s-none";}
 function peopleRows(){
-  if(CONFIG.people&&CONFIG.people.length)return CONFIG.people;
+  if(CONFIG.people&&CONFIG.people.length)return CONFIG.people.map(p=>p.label);
   return [...new Set(ITEMS.map(i=>i.person).filter(Boolean))].sort();
 }
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// Index : "id" et "nom/email en minuscules" -> label affiché
+const ID_INDEX={}, NAME_INDEX={};
+for(const p of CONFIG.people){
+  (p.ids||[]).forEach(id=>ID_INDEX[String(id)]=p.label);
+  (p.match||[]).forEach(m=>NAME_INDEX[String(m).trim().toLowerCase()]=p.label);
+  NAME_INDEX[p.label.trim().toLowerCase()]=p.label;
+}
+function resolveById(id){ return ID_INDEX[String(id)]||null; }
+function resolvePerson(raw){
+  if(!raw) return null;
+  return NAME_INDEX[String(raw).trim().toLowerCase()]||null;
+}
 
 function render(){
   const days=weekDays(weekStart),dayIso=days.map(iso),todayIso=iso(new Date());
@@ -222,7 +261,7 @@ function render(){
     dayIso.forEach((k,di)=>{if(k>=s&&k<=e){
       (byPD[it.person+"||"+k]=byPD[it.person+"||"+k]||[]).push({...it,_isStart:k===s});}});
   }
-  let html="<thead><tr><th class='namecol'>Technicien</th>";
+  let html="<thead><tr><th class='namecol'>Name</th>";
   days.forEach((d,i)=>{const we=i>=5,td=dayIso[i]===todayIso;
     html+=`<th class="${we?'weekend':''} ${td?'today':''}">${DOW[i]}<span class="dow">${fmtDay(d)}</span></th>`;});
   html+="</tr></thead><tbody>";
@@ -233,11 +272,10 @@ function render(){
       let cell="";
       for(const t of tasks){
         const pc=PRIO[t.priority]?PRIO[t.priority][1]:"transparent";
-        const pl=PRIO[t.priority]?PRIO[t.priority][0]:"";
-        cell+=`<span class="chip ${statusClass(t.status)}${t._isStart?'':' cont'}" data-id="${t.id}" title="${esc(t.name)}">
-          <span class="pbar" style="background:${pc}"></span>${esc(t.name)}`+
-          (t.priority?` <small>${esc(t.status||'—')} · ${pl}</small>`:
-            (t.status?`<small>${esc(t.status)}</small>`:""))+`</span>`;
+        const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
+        cell+=`<span class="chip ${statusClass(t.status)}${t._isStart?'':' cont'}" data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
+          <span class="pbar" style="background:${pc}"></span>${badge}<span class="cname">${esc(t.name)}</span>`+
+          (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
       }
       html+=`<td class="cell ${we?'weekend':''} ${td?'today':''}">${cell}</td>`;
     });
@@ -310,7 +348,12 @@ function toast(msg){
   clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);
 }
 
-document.getElementById("legend").innerHTML=LEGEND.map(([l,c])=>`<span><i class="${c}"></i>${l}</span>`).join("");
+document.getElementById("legend").innerHTML=
+  LEGEND.map(([l,c])=>`<span><i class="${c}"></i>${l}</span>`).join("")
+  +`<span style="margin-left:6px;padding-left:12px;border-left:1px solid var(--grid)">`
+  +Object.entries(PRIO).map(([full,[ab,col]])=>
+     `<span style="margin-right:10px"><i style="background:${col};border-radius:50%"></i>${full}</span>`
+   ).join("")+`</span>`;
 document.getElementById("prev").onclick=()=>{weekStart.setDate(weekStart.getDate()-7);weekStart=new Date(weekStart);render();};
 document.getElementById("next").onclick=()=>{weekStart.setDate(weekStart.getDate()+7);weekStart=new Date(weekStart);render();};
 document.getElementById("today-btn").onclick=()=>{weekStart=mondayOf(new Date());render();};
