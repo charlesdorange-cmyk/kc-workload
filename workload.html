@@ -8,7 +8,7 @@
   :root{
     --bg:#0f1419; --panel:#161c24; --grid:#2a323d;
     --ink:#e8edf2; --ink-dim:#8a94a0; --head:#1b222b;
-    --today:#1f2d3d; --offday:#11161c;
+    --today:#1f2d3d; --offday:#11161c; --slot:#141a21;
     --s-working:#fdab3d; --s-done:#00c875; --s-stuck:#df2f4a;
     --s-check:#ff6d3b; --s-planned:#579bfc; --s-standby:#007eb5;
     --s-test:#bb3354; --s-valid:#ff007f; --s-none:#3a4450;
@@ -28,38 +28,57 @@
     border-radius:6px;padding:6px 12px;font-size:14px;cursor:pointer;font-family:var(--font)}
   .controls button:hover{background:var(--grid)}
   .meta{font-size:11px;color:var(--ink-dim);min-width:130px;text-align:right}
-  .wrap{height:calc(100% - 54px);overflow:auto}
+  .legend{display:flex;gap:13px;flex-wrap:wrap;align-items:center}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  .legend span{font-size:12px;color:var(--ink-dim)}
+
+  .layout{display:flex;height:calc(100% - 54px)}
+  .wrap{flex:1;overflow:auto}
   table{border-collapse:collapse;width:100%;table-layout:fixed}
   th,td{border:1px solid var(--grid);vertical-align:top}
   thead th{position:sticky;top:0;z-index:3;background:var(--head);
-    padding:8px 6px;font-size:14px;font-weight:600;text-align:center}
-  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:12px}
-  thead th .dow{display:block;font-size:12px;color:var(--ink-dim);font-weight:500}
+    padding:6px 4px;font-size:13px;font-weight:600;text-align:center}
+  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:12px;width:120px}
+  thead th .dow{display:block;font-size:11px;color:var(--ink-dim);font-weight:500}
   thead th.today{background:var(--today);color:#fff}
   thead th.weekend,thead th.weekend .dow{color:#6b7686}
+  thead th.ampm{font-size:10px;color:var(--ink-dim);font-weight:600;padding:2px}
   td.name{position:sticky;left:0;z-index:2;background:var(--panel);
-    font-weight:600;font-size:14px;padding:8px 12px;width:150px}
-  td.cell{padding:4px;height:78px}
+    font-weight:600;font-size:13px;padding:6px 12px;width:120px}
+  td.slot{padding:3px;height:64px;background:var(--slot)}
+  td.slot.pm{background:#11161d}
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
+  td.slot.dragover{background:#26405e;outline:2px dashed var(--s-planned);outline-offset:-2px}
   tbody tr:nth-child(even) td.name{background:#12181f}
-  .chip{position:relative;display:block;border-radius:5px;padding:4px 7px 4px 11px;
-    margin-bottom:3px;font-size:12px;line-height:1.25;font-weight:500;color:#0d1117;
-    overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+
+  .chip{position:relative;display:block;border-radius:5px;padding:4px 7px 4px 12px;
+    margin-bottom:3px;font-size:12px;line-height:1.2;font-weight:500;color:#0d1117;
+    cursor:grab;user-select:none;overflow:hidden}
   .chip:hover{outline:2px solid rgba(255,255,255,.5)}
-  .chip.cont{opacity:.82}
+  .chip.dragging{opacity:.4}
+  .chip.cont{opacity:.85}
   .chip .pbar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:5px 0 0 5px}
   .chip .prio{display:inline-block;width:9px;height:9px;border-radius:50%;
     margin-right:6px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
-  .chip .cname{font-weight:600}
-  .chip small{display:block;font-size:10px;opacity:.72;font-weight:600}
+  .chip .cname{font-weight:600;pointer-events:none}
+  .chip small{display:block;font-size:10px;opacity:.72;font-weight:600;pointer-events:none}
+  .chip .grip{position:absolute;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:2}
+  .chip .grip.l{left:0} .chip .grip.r{right:0}
+  .chip .grip:hover{background:rgba(255,255,255,.35)}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
   .s-planned{background:var(--s-planned);color:#fff} .s-standby{background:var(--s-standby);color:#fff}
   .s-test{background:var(--s-test);color:#fff} .s-valid{background:var(--s-valid);color:#fff}
   .s-none{background:var(--s-none);color:#cfd6dd}
-  .legend{display:flex;gap:13px;flex-wrap:wrap;align-items:center}
-  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-  .legend span{font-size:12px;color:var(--ink-dim)}
+
+  /* zone non planifiées */
+  .unplanned{width:200px;flex:none;background:var(--panel);border-left:1px solid var(--grid);
+    overflow:auto;padding:8px}
+  .unplanned h2{font-size:12px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--ink-dim);margin-bottom:8px}
+  .unplanned.dragover{outline:2px dashed var(--s-planned);outline-offset:-4px}
+  .unplanned .chip{cursor:grab}
+
   .banner{background:#3a2d10;color:#ffcf7a;font-size:12px;padding:6px 18px;
     border-bottom:1px solid var(--grid);text-align:center}
   .banner.hidden{display:none}
@@ -110,7 +129,11 @@
     </div>
   </div>
   <div class="banner" id="banner">Mode démo — données d'exemple. Renseignez l'URL du Worker pour charger les vraies tâches.</div>
-  <div class="wrap"><table id="grid"></table></div>
+  <div class="layout">
+    <div class="wrap"><table id="grid"></table></div>
+    <div class="unplanned" id="unplanned"><h2>Non planifiées</h2><div id="unplanned-list"></div></div>
+  </div>
+
   <div class="scrim" id="scrim"></div>
   <aside class="panel" id="panel">
     <button class="close" id="close">×</button>
@@ -118,11 +141,16 @@
     <div class="body" id="p-body"></div>
   </aside>
   <div class="toast" id="toast"></div>
+
 <script>
+/* ===================== CONFIG ===================== */
 const CONFIG={
   boardId:5098586993,
-  // Chaque personne : label = affiché dans la grille ; match = noms/emails
-  // possibles renvoyés par Monday (insensible à la casse).
+  startHourCol:"hour_mm4d7vv5",
+  endHourCol:"hour_mm4dj37r",
+  // créneaux demi-journée
+  AM:{start:"08:00",end:"12:00"},
+  PM:{start:"13:00",end:"17:00"},
   people:[
     {label:"Antoine B",  ids:["101235282"], match:["Antoine Ballot"]},
     {label:"Mathieu P",  ids:["104764134"], match:["Mathieu Perramant"]},
@@ -154,212 +182,404 @@ const PRIO={"Before Dock Out":["BDO","var(--p-dock)"],"Before next Sailing":["BN
 const statusColor=s=>getComputedStyle(document.documentElement)
   .getPropertyValue("--"+((STATUS_CLASS[s])||"s-none")).trim()||"#3a4450";
 
+/* ===================== DATES / SLOTS ===================== */
 const DOW=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
 const fmtDay=d=>d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short"});
-const iso=d=>d.toISOString().slice(0,10);
+const iso=d=>{const z=new Date(d);z.setMinutes(z.getMinutes()-z.getTimezoneOffset());return z.toISOString().slice(0,10);};
 function mondayOf(date){const d=new Date(date);const k=(d.getDay()+6)%7;
   d.setDate(d.getDate()-k);d.setHours(0,0,0,0);return d;}
 function weekDays(m){return Array.from({length:7},(_,i)=>{const d=new Date(m);d.setDate(d.getDate()+i);return d;});}
-
-let weekStart=mondayOf(new Date());
-let ITEMS=[],RAW={},usingDemo=false;
-
-function demoItems(){
-  const mon=mondayOf(new Date());
-  const day=i=>{const d=new Date(mon);d.setDate(d.getDate()+i);return iso(d);};
-  const mk=(id,name,person,s,e,status,prio,desc,fix,files)=>({
-    id,name,person,start:day(s),end:day(e),status,priority:prio,
-    description:desc||"",how:fix||"",files:files||[],
-    url:"https://k-challenge.monday.com/boards/5098586993/pulses/"+id});
-  return [
-    mk(1,"Coin de voile","Mathieu P",0,2,"Working on it","Before Dock Out",
-       "Reprise du coin de voile bâbord, ponçage + stratification.","Stratification 3 plis 300gsm, ponçage P240.",
-       [{name:"plan_coin.pdf",url:"#"},{name:"photo_avant.jpg",url:"#"}]),
-    mk(2,"Ajustage Barrel et montage Barrel","Antoine B",0,1,"Working on it","Before next Sailing"),
-    mk(3,"Préparation Flap","Antoine B",1,1,"Working on it","When possible"),
-    mk(4,"Foil Belt Fairing","Antoine B",2,3,"Planned","Before Dock Out"),
-    mk(5,"Cockpit/siege","Kevin L",0,4,"Working on it","Before next Sailing"),
-    mk(6,"Poncage Foil Arm","Mathieu P",2,3,"Planned","Nice to have"),
-    mk(7,"Foil Hinges+Seal Port","Philippe E",1,1,"To be checked","Before Dock Out"),
-    mk(8,"Remontage Accastillage Mat","Fons D",2,4,"Planned","When possible"),
-    mk(9,"Tente pour peinture Foil","Germain R",2,2,"Planned","Nice to have"),
-    mk(10,"Mat 2","Ludovic B",0,5,"Working on it","Before next Sailing"),
-    mk(11,"Batten Bridge","Jean-Luc L",2,3,"Planned","On hold"),
-    mk(12,"Foil Flap","Ben T",3,5,"Planned","Before Dock Out"),
-    mk(13,"Spray Rail adjust","Ben T",1,2,"To be checked","Nice to have"),
-    mk(14,"Coin de voile","Fred L",0,1,"Working on it","Before Dock Out"),
-    mk(15,"Collage Slider Jib","Philippe E",4,4,"Planned","When possible")
-  ];
-}
-
-function normalize(apiItems){
-  const out=[];RAW={};
-  for(const it of apiItems){
-    const cv=it.column_values||it.columns||{};
-    const get=k=>{const v=cv[k];return v==null?"":(typeof v==="string"?v:(v.text||""));};
-    const personText=get("person");           // noms, séparés par virgule
-    const personIds=it.person_ids||[];         // IDs Monday (fiable)
-    const status=get("status")||null,priority=get("priority")||null;
-    let start=null,end=null;
-    const tl=get("timeline");
-    if(tl&&tl.includes(" - ")){[start,end]=tl.split(" - ");}
-    if(!start){const d=get("date0__1");if(d){start=d;end=d;}}
-    const files=(it.files||cv.files_assets||[]).map(f=>({name:f.name,url:f.public_url||f.url}));
-    RAW[it.id]={description:get("description"),how:get("how_we_fixed_it_"),files,url:it.url};
-    // 1) résout par ID (fiable), 2) complète par nom texte
-    let labels=personIds.map(resolveById).filter(Boolean);
-    if(!labels.length){
-      labels=personText.split(",").map(s=>resolvePerson(s.trim())).filter(Boolean);
-    }
-    labels=[...new Set(labels)];
-    for(const p of labels){
-      out.push({id:it.id,name:it.name,person:p,start,end,status,priority,url:it.url,
-        files,description:get("description"),how:get("how_we_fixed_it_")});
-    }
+function addDays(isoStr,n){const d=new Date(isoStr+"T00:00:00");d.setDate(d.getDate()+n);return iso(d);}
+// un "slot" = {date:"YYYY-MM-DD", half:"AM"|"PM"} ; on le sérialise en index pour comparer
+function slotKey(dateIso,half){return dateIso+"#"+half;}
+// liste ordonnée des slots entre (startDate,startHalf) et (endDate,endHalf) inclus
+function slotsBetween(sd,sh,ed,eh){
+  const out=[];let d=sd,h=sh;
+  let guard=0;
+  while(guard++<400){
+    out.push({date:d,half:h});
+    if(d===ed&&h===eh)break;
+    if(h==="AM"){h="PM";}else{h="AM";d=addDays(d,1);}
   }
   return out;
 }
-
-async function load(){
-  if(CONFIG.workerUrl){
-    try{
-      const r=await fetch(CONFIG.workerUrl+"/platform",{cache:"no-store"});
-      if(!r.ok)throw new Error(r.status);
-      const data=await r.json();ITEMS=normalize(data.items||data);usingDemo=false;
-    }catch(e){console.warn("Worker KO -> démo:",e);ITEMS=demoItems();usingDemo=true;}
-  }else{ITEMS=demoItems();usingDemo=true;}
-  document.getElementById("banner").classList.toggle("hidden",!usingDemo);
-  render();
+// déduit le créneau de début/fin d'une tâche depuis ses heures Monday
+function halfFromHour(hhmm,isStart){
+  if(!hhmm) return isStart?"AM":"PM"; // défaut : journée complète
+  const h=parseInt(hhmm.split(":")[0],10);
+  return h<12.5?"AM":"PM";
 }
 
-function statusClass(s){return STATUS_CLASS[s]||"s-none";}
-function peopleRows(){
-  if(CONFIG.people&&CONFIG.people.length)return CONFIG.people.map(p=>p.label);
-  return [...new Set(ITEMS.map(i=>i.person).filter(Boolean))].sort();
-}
-const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* ===================== ÉTAT ===================== */
+let weekStart=mondayOf(new Date());
+let ITEMS=[];     // tâches normalisées planifiées (1 par personne)
+let UNPLANNED=[]; // tâches sans date ou sans personne
+let RAW={},usingDemo=false,refreshTimer=null,dragLock=false;
 
-// Index : "id" et "nom/email en minuscules" -> label affiché
-const ID_INDEX={}, NAME_INDEX={};
+/* ===================== INDEX PERSONNES ===================== */
+const ID_INDEX={},NAME_INDEX={},LABEL_TO_IDS={};
 for(const p of CONFIG.people){
   (p.ids||[]).forEach(id=>ID_INDEX[String(id)]=p.label);
   (p.match||[]).forEach(m=>NAME_INDEX[String(m).trim().toLowerCase()]=p.label);
   NAME_INDEX[p.label.trim().toLowerCase()]=p.label;
+  LABEL_TO_IDS[p.label]=p.ids||[];
 }
-function resolveById(id){ return ID_INDEX[String(id)]||null; }
-function resolvePerson(raw){
-  if(!raw) return null;
-  return NAME_INDEX[String(raw).trim().toLowerCase()]||null;
+const resolveById=id=>ID_INDEX[String(id)]||null;
+const resolvePerson=raw=>raw?(NAME_INDEX[String(raw).trim().toLowerCase()]||null):null;
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ===================== DÉMO ===================== */
+function demoItems(){
+  const mon=mondayOf(new Date());
+  const day=i=>iso(new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+i));
+  const mk=(id,name,person,s,sh,e,eh,status,prio)=>({
+    id,name,person,start:day(s),startHalf:sh,end:day(e),endHalf:eh,status,priority:prio,
+    description:"",how:"",files:[],
+    url:"https://k-challenge.monday.com/boards/5098586993/pulses/"+id});
+  return [
+    mk(1,"Coin de voile","Mathieu P",0,"AM",2,"PM","Working on it","Before Dock Out"),
+    mk(2,"Ajustage Barrel","Antoine B",0,"AM",1,"PM","Working on it","Before next Sailing"),
+    mk(4,"Foil Belt Fairing","Antoine B",2,"AM",3,"AM","Planned","Before Dock Out"),
+    mk(5,"Cockpit/siege","Kevin L",0,"AM",4,"PM","Working on it","Before next Sailing"),
+    mk(7,"Foil Hinges+Seal Port","Philippe E",1,"PM",1,"PM","To be checked","Before Dock Out"),
+    mk(8,"Remontage Accastillage Mat","Fons D",2,"AM",4,"PM","Planned","When possible"),
+    mk(10,"Mat 2","Ludovic B",0,"AM",5,"PM","Working on it","Before next Sailing"),
+    mk(11,"Batten Bridge","Jean-Luc L",2,"AM",3,"PM","Planned","On hold"),
+    mk(12,"Foil Flap","Ben T",3,"PM",5,"AM","Planned","Before Dock Out")
+  ];
+}
+function demoUnplanned(){
+  return [
+    {id:90,name:"Build Accumulator End Cap x2",person:null,status:"",priority:"Nice to have",files:[],description:"",how:"",url:"#"},
+    {id:91,name:"New implementation of lidar",person:null,status:"",priority:"On hold",files:[],description:"",how:"",url:"#"}
+  ];
+}
+
+/* ===================== NORMALISATION API ===================== */
+function normalize(apiItems){
+  const planned=[],unplanned=[];RAW={};
+  for(const it of apiItems){
+    const cv=it.column_values||{};
+    const get=k=>{const v=cv[k];return v==null?"":(typeof v==="string"?v:(v.text||""));};
+    const personText=get("person");
+    const personIds=it.person_ids||[];
+    const status=get("status")||null,priority=get("priority")||null;
+    const startHour=it.start_hour||"",endHour=it.end_hour||"";
+    let start=null,end=null;
+    const tl=get("timeline");
+    if(tl&&tl.includes(" - ")){[start,end]=tl.split(" - ");}
+    if(!start){const d=get("date0__1");if(d){start=d;end=d;}}
+    const files=(it.files||[]).map(f=>({name:f.name,url:f.public_url||f.url}));
+    RAW[it.id]={description:get("description"),how:get("how_we_fixed_it_"),files,url:it.url};
+    // résolution personnes
+    let labels=personIds.map(resolveById).filter(Boolean);
+    if(!labels.length) labels=personText.split(",").map(s=>resolvePerson(s.trim())).filter(Boolean);
+    labels=[...new Set(labels)];
+    const base={id:it.id,name:it.name,status,priority,url:it.url,files,
+      description:get("description"),how:get("how_we_fixed_it_"),
+      startHour,endHour};
+    if(start && labels.length){
+      const startHalf=halfFromHour(startHour,true);
+      const endHalf=halfFromHour(endHour,false);
+      for(const p of labels)
+        planned.push({...base,person:p,start,end:end||start,startHalf,endHalf});
+    }else{
+      unplanned.push({...base,person:labels[0]||null});
+    }
+  }
+  return {planned,unplanned};
+}
+
+/* ===================== CHARGEMENT ===================== */
+async function load(){
+  if(dragLock) return; // ne pas recharger pendant un geste
+  if(CONFIG.workerUrl){
+    try{
+      const r=await fetch(CONFIG.workerUrl+"/platform",{cache:"no-store"});
+      if(!r.ok)throw new Error(r.status);
+      const data=await r.json();
+      const n=normalize(data.items||data);
+      ITEMS=n.planned;UNPLANNED=n.unplanned;usingDemo=false;
+    }catch(e){console.warn("Worker KO -> démo:",e);ITEMS=demoItems();UNPLANNED=demoUnplanned();usingDemo=true;}
+  }else{ITEMS=demoItems();UNPLANNED=demoUnplanned();usingDemo=true;}
+  document.getElementById("banner").classList.toggle("hidden",!usingDemo);
+  render();
+}
+
+/* ===================== RENDU ===================== */
+function statusClass(s){return STATUS_CLASS[s]||"s-none";}
+function peopleRows(){return CONFIG.people.map(p=>p.label);}
+
+function chipHTML(t,opts){
+  opts=opts||{};
+  const pc=PRIO[t.priority]?PRIO[t.priority][1]:"transparent";
+  const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
+  const grips=opts.grips?`<span class="grip l" data-grip="l"></span><span class="grip r" data-grip="r"></span>`:"";
+  return `<span class="chip ${statusClass(t.status)}${opts.cont?' cont':''}" draggable="true"
+    data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
+    <span class="pbar" style="background:${pc}"></span>${grips}${badge}<span class="cname">${esc(t.name)}</span>`+
+    (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
 }
 
 function render(){
   const days=weekDays(weekStart),dayIso=days.map(iso),todayIso=iso(new Date());
-  const rows=peopleRows(),byPD={};
+  const rows=peopleRows();
+  // index : personne -> slotKey -> [{task,isStart}]
+  const byCell={};
   for(const it of ITEMS){
     if(!it.person||!it.start)continue;
-    const s=it.start,e=it.end||it.start;
-    dayIso.forEach((k,di)=>{if(k>=s&&k<=e){
-      (byPD[it.person+"||"+k]=byPD[it.person+"||"+k]||[]).push({...it,_isStart:k===s});}});
+    const slots=slotsBetween(it.start,it.startHalf||"AM",it.end||it.start,it.endHalf||"PM");
+    slots.forEach((s,i)=>{
+      const key=it.person+"||"+slotKey(s.date,s.half);
+      (byCell[key]=byCell[key]||[]).push({task:it,isStart:i===0});
+    });
   }
-  let html="<thead><tr><th class='namecol'>Name</th>";
+  // entête : 2 niveaux (jour, puis AM/PM)
+  let html="<thead><tr><th class='namecol' rowspan='2'>Name</th>";
   days.forEach((d,i)=>{const we=i>=5,td=dayIso[i]===todayIso;
-    html+=`<th class="${we?'weekend':''} ${td?'today':''}">${DOW[i]}<span class="dow">${fmtDay(d)}</span></th>`;});
+    html+=`<th colspan="2" class="${we?'weekend':''} ${td?'today':''}">${DOW[i]}<span class="dow">${fmtDay(d)}</span></th>`;});
+  html+="</tr><tr>";
+  days.forEach((d,i)=>{const we=i>=5,td=dayIso[i]===todayIso;
+    html+=`<th class="ampm ${we?'weekend':''} ${td?'today':''}">AM</th><th class="ampm ${we?'weekend':''} ${td?'today':''}">PM</th>`;});
   html+="</tr></thead><tbody>";
   for(const person of rows){
     html+=`<tr><td class="name">${esc(person)}</td>`;
     days.forEach((d,i)=>{
-      const we=i>=5,td=dayIso[i]===todayIso,tasks=byPD[person+"||"+dayIso[i]]||[];
-      let cell="";
-      for(const t of tasks){
-        const pc=PRIO[t.priority]?PRIO[t.priority][1]:"transparent";
-        const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
-        cell+=`<span class="chip ${statusClass(t.status)}${t._isStart?'':' cont'}" data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
-          <span class="pbar" style="background:${pc}"></span>${badge}<span class="cname">${esc(t.name)}</span>`+
-          (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
-      }
-      html+=`<td class="cell ${we?'weekend':''} ${td?'today':''}">${cell}</td>`;
+      const we=i>=5,td=dayIso[i]===todayIso;
+      ["AM","PM"].forEach(half=>{
+        const cellTasks=byCell[person+"||"+slotKey(dayIso[i],half)]||[];
+        let inner="";
+        for(const ct of cellTasks)
+          inner+=chipHTML(ct.task,{cont:!ct.isStart,grips:ct.isStart});
+        html+=`<td class="slot ${half==='PM'?'pm':''} ${we?'weekend':''} ${td?'today':''}"
+          data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}">${inner}</td>`;
+      });
     });
     html+="</tr>";
   }
   html+="</tbody>";
   document.getElementById("grid").innerHTML=html;
+
+  // zone non planifiées
+  document.getElementById("unplanned-list").innerHTML=
+    UNPLANNED.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
+
   document.getElementById("meta").textContent=
     (usingDemo?"DÉMO · ":"")+"MàJ "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
-  document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>openPanel(c.dataset.id));
+
+  bindChipClicks();
+  bindDnD();
 }
 
+/* ===================== CLIC -> PANNEAU ===================== */
+function findTask(id){return ITEMS.find(x=>String(x.id)===String(id))||UNPLANNED.find(x=>String(x.id)===String(id));}
+function bindChipClicks(){
+  document.querySelectorAll(".chip").forEach(c=>{
+    c.addEventListener("click",e=>{
+      if(c._wasDragged){c._wasDragged=false;return;}
+      if(e.target.classList.contains("grip"))return;
+      openPanel(c.dataset.id);
+    });
+  });
+}
 let currentId=null;
 function openPanel(id){
-  currentId=id;
-  const it=ITEMS.find(x=>String(x.id)===String(id));if(!it)return;
+  currentId=id;const it=findTask(id);if(!it)return;
   const det=RAW[id]||{description:it.description,how:it.how,files:it.files,url:it.url};
   document.getElementById("p-title").textContent=it.name;
   const prio=it.priority?`<span class="pill" style="background:${PRIO[it.priority]?PRIO[it.priority][1]:'#3a4450'}">${esc(it.priority)}</span>`:'<span class="none">—</span>';
   const files=(det.files&&det.files.length)
-    ? `<div class="files">${det.files.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.name)}</a>`).join("")}</div>`
-    : '<p class="none">Aucun fichier</p>';
+    ?`<div class="files">${det.files.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.name)}</a>`).join("")}</div>`
+    :'<p class="none">Aucun fichier</p>';
   const statusBtns=STATUS_OPTIONS.map(s=>{
     const active=(s===it.status)?" active":"";
     const wht=['Stuck','Standby','Testing & Validation','Sailors validation','Planned'].includes(s)?'color:#fff;':'';
     return `<button class="set-status${active}" data-label="${esc(s)}" style="background:${statusColor(s)};${wht}">${esc(s)}</button>`;
   }).join("");
   document.getElementById("p-body").innerHTML=`
-    <h3>Statut — cliquer pour changer</h3>
-    <div class="statusgrid" id="statusgrid">${statusBtns}</div>
+    <h3>Statut — cliquer pour changer</h3><div class="statusgrid">${statusBtns}</div>
     <h3>Priorité</h3>${prio}
     <h3>Description</h3>${det.description?`<div class="txt">${esc(det.description)}</div>`:'<p class="none">—</p>'}
     <h3>How we fixed it?</h3>${det.how?`<div class="txt">${esc(det.how)}</div>`:'<p class="none">—</p>'}
     <h3>Fichiers associés</h3>${files}
-    <h3>Monday</h3><a class="openlink" href="${esc(det.url)}" target="_blank" rel="noopener">Ouvrir la tâche dans Monday ↗</a>`;
-  document.querySelectorAll(".set-status").forEach(b=>b.onclick=()=>changeStatus(b.dataset.label,b));
+    <h3>Monday</h3><a class="openlink" href="${esc(det.url)}" target="_blank" rel="noopener">Ouvrir dans Monday ↗</a>`;
+  document.querySelectorAll(".set-status").forEach(b=>b.onclick=()=>changeStatus(b.dataset.label));
   document.getElementById("scrim").classList.add("open");
   document.getElementById("panel").classList.add("open");
 }
-function closePanel(){
-  document.getElementById("scrim").classList.remove("open");
-  document.getElementById("panel").classList.remove("open");currentId=null;
-}
+function closePanel(){document.getElementById("scrim").classList.remove("open");
+  document.getElementById("panel").classList.remove("open");currentId=null;}
 document.getElementById("close").onclick=closePanel;
 document.getElementById("scrim").onclick=closePanel;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closePanel();});
 
-async function changeStatus(label,btn){
-  if(!currentId)return;
-  if(usingDemo){applyStatusLocal(currentId,label);refreshPanelActive(label);
-    toast("Démo : statut « "+label+" » (non écrit dans Monday)");return;}
+/* ===================== CHANGER STATUT ===================== */
+async function changeStatus(label){
+  if(!currentId)return;const it=findTask(currentId);
+  if(usingDemo){if(it)it.status=label;render();reopenIfActive(label);toast("Démo : statut « "+label+" »");return;}
   const btns=document.querySelectorAll(".set-status");btns.forEach(b=>b.disabled=true);
   try{
     const r=await fetch(CONFIG.workerUrl+"/status",{method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({itemId:Number(currentId),label})});
     if(!r.ok)throw new Error(await r.text());
-    applyStatusLocal(currentId,label);refreshPanelActive(label);
-    toast("Statut mis à jour : « "+label+" »");
-  }catch(e){console.error(e);toast("Échec de la mise à jour. Réessayez.");}
-  finally{btns.forEach(b=>b.disabled=false);}
+    if(it)it.status=label;render();reopenIfActive(label);toast("Statut : « "+label+" »");
+  }catch(e){console.error(e);toast("Échec mise à jour statut.");}
+  finally{document.querySelectorAll(".set-status").forEach(b=>b.disabled=false);}
 }
-function applyStatusLocal(id,label){
-  ITEMS.forEach(it=>{if(String(it.id)===String(id))it.status=label;});render();
-}
-function refreshPanelActive(label){
+function reopenIfActive(label){
   document.querySelectorAll(".set-status").forEach(b=>b.classList.toggle("active",b.dataset.label===label));
 }
-function toast(msg){
-  const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
-  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);
+
+/* ===================== DRAG & DROP ===================== */
+let dragState=null; // {id, mode:'move'|'resizeL'|'resizeR'}
+function bindDnD(){
+  // griffes de resize : on intercepte le mousedown pour mode resize
+  document.querySelectorAll(".chip .grip").forEach(g=>{
+    g.addEventListener("mousedown",e=>{
+      const chip=g.closest(".chip");
+      dragState={id:chip.dataset.id,mode:g.dataset.grip==="l"?"resizeL":"resizeR"};
+      e.stopPropagation();
+    });
+  });
+  document.querySelectorAll(".chip").forEach(chip=>{
+    chip.addEventListener("dragstart",e=>{
+      dragLock=true;chip.classList.add("dragging");
+      if(!dragState)dragState={id:chip.dataset.id,mode:"move"};
+      e.dataTransfer.setData("text/plain",chip.dataset.id);
+      e.dataTransfer.effectAllowed="move";
+    });
+    chip.addEventListener("dragend",()=>{
+      chip.classList.remove("dragging");chip._wasDragged=true;
+      setTimeout(()=>{dragLock=false;},200);
+      document.querySelectorAll(".dragover").forEach(x=>x.classList.remove("dragover"));
+    });
+  });
+  // cibles : slots de la grille
+  document.querySelectorAll("td.slot").forEach(td=>{
+    td.addEventListener("dragover",e=>{e.preventDefault();td.classList.add("dragover");});
+    td.addEventListener("dragleave",()=>td.classList.remove("dragover"));
+    td.addEventListener("drop",e=>{
+      e.preventDefault();td.classList.remove("dragover");
+      onDropSlot(td.dataset.person,td.dataset.date,td.dataset.half);
+    });
+  });
+  // cible : zone non planifiées (retirer la planif)
+  const uz=document.getElementById("unplanned");
+  uz.addEventListener("dragover",e=>{e.preventDefault();uz.classList.add("dragover");});
+  uz.addEventListener("dragleave",()=>uz.classList.remove("dragover"));
+  uz.addEventListener("drop",e=>{e.preventDefault();uz.classList.remove("dragover");onDropUnplan();});
 }
 
+function onDropSlot(person,date,half){
+  if(!dragState)return;
+  const id=dragState.id,mode=dragState.mode;dragState=null;
+  const it=findTask(id);if(!it)return;
+
+  if(mode==="move"){
+    // calcule la durée en slots, repositionne le début sur (date,half), garde personne cible
+    let nbSlots=1;
+    if(it.start){
+      nbSlots=slotsBetween(it.start,it.startHalf||"AM",it.end||it.start,it.endHalf||"PM").length;
+    }
+    const startSlot={date,half};
+    const seq=expandSlots(startSlot,nbSlots);
+    const endSlot=seq[seq.length-1];
+    applySchedule(it,person,startSlot,endSlot);
+  }else if(mode==="resizeR"){
+    // étend/réduit la fin jusqu'à (date,half), même personne, même début
+    if(!it.start)return;
+    const s={date:it.start,half:it.startHalf||"AM"};
+    const e={date,half};
+    if(slotIndex(e)<slotIndex(s)) return; // fin avant début : ignore
+    applySchedule(it,it.person,s,e);
+  }else if(mode==="resizeL"){
+    if(!it.start)return;
+    const e={date:it.end||it.start,half:it.endHalf||"PM"};
+    const s={date,half};
+    if(slotIndex(s)>slotIndex(e)) return;
+    applySchedule(it,it.person,s,e);
+  }
+}
+function onDropUnplan(){
+  if(!dragState)return;const id=dragState.id;dragState=null;
+  const it=ITEMS.find(x=>String(x.id)===String(id));if(!it)return;
+  // retire la planif : vide timeline (et passe en non planifié)
+  applyUnschedule(it);
+}
+
+// index absolu d'un slot pour comparaisons (jours*2 + AM/PM)
+function slotIndex(s){const d=new Date(s.date+"T00:00:00");return Math.round(d.getTime()/86400000)*2+(s.half==="PM"?1:0);}
+function expandSlots(start,n){
+  const out=[];let d=start.date,h=start.half;
+  for(let i=0;i<n;i++){out.push({date:d,half:h});if(h==="AM")h="PM";else{h="AM";d=addDays(d,1);}}
+  return out;
+}
+
+/* ---- applique une nouvelle planif (optimiste + écriture Monday) ---- */
+async function applySchedule(it,person,startSlot,endSlot){
+  const from=startSlot.date,to=endSlot.date;
+  const startHour=startSlot.half==="AM"?CONFIG.AM.start:CONFIG.PM.start;
+  const endHour=endSlot.half==="AM"?CONFIG.AM.end:CONFIG.PM.end;
+  // snapshot pour rollback
+  const snap={...it};
+  const personChanged=(person&&person!==it.person);
+
+  // maj optimiste locale
+  it.person=person||it.person;it.start=from;it.end=to;
+  it.startHalf=startSlot.half;it.endHalf=endSlot.half;
+  // si la tâche venait des non planifiées
+  if(UNPLANNED.includes(it)){UNPLANNED=UNPLANNED.filter(x=>x!==it);ITEMS.push(it);}
+  render();
+
+  if(usingDemo){toast("Démo : déplacement (non écrit)");return;}
+  try{
+    const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({itemId:Number(it.id),from,to,startHour,endHour})});
+    if(!r.ok)throw new Error(await r.text());
+    if(personChanged){
+      const ids=LABEL_TO_IDS[person]||[];
+      const rp=await fetch(CONFIG.workerUrl+"/person",{method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({itemId:Number(it.id),personIds:ids})});
+      if(!rp.ok)throw new Error(await rp.text());
+    }
+    toast("Enregistré dans Monday");
+  }catch(e){
+    console.error(e);
+    Object.assign(it,snap);render();toast("Échec — remis en place");
+  }
+}
+async function applyUnschedule(it){
+  const snap={...it};
+  ITEMS=ITEMS.filter(x=>x!==it);it.start=null;it.end=null;UNPLANNED.push(it);render();
+  if(usingDemo){toast("Démo : retiré du planning");return;}
+  try{
+    // vide la timeline
+    const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({itemId:Number(it.id),from:"",to:""})});
+    if(!r.ok)throw new Error(await r.text());
+    toast("Retiré du planning");
+  }catch(e){console.error(e);Object.assign(it,snap);ITEMS.push(it);UNPLANNED=UNPLANNED.filter(x=>x!==it);render();toast("Échec");}
+}
+
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);}
+
+/* ===================== INIT ===================== */
 document.getElementById("legend").innerHTML=
   LEGEND.map(([l,c])=>`<span><i class="${c}"></i>${l}</span>`).join("")
   +`<span style="margin-left:6px;padding-left:12px;border-left:1px solid var(--grid)">`
   +Object.entries(PRIO).map(([full,[ab,col]])=>
-     `<span style="margin-right:10px"><i style="background:${col};border-radius:50%"></i>${full}</span>`
-   ).join("")+`</span>`;
+     `<span style="margin-right:10px"><i style="background:${col};border-radius:50%"></i>${full}</span>`).join("")
+  +`</span>`;
 document.getElementById("prev").onclick=()=>{weekStart.setDate(weekStart.getDate()-7);weekStart=new Date(weekStart);render();};
 document.getElementById("next").onclick=()=>{weekStart.setDate(weekStart.getDate()+7);weekStart=new Date(weekStart);render();};
 document.getElementById("today-btn").onclick=()=>{weekStart=mondayOf(new Date());render();};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closePanel();});
 load();
-setInterval(load,CONFIG.refreshMs);
+refreshTimer=setInterval(load,CONFIG.refreshMs);
 </script>
 </body>
 </html>
