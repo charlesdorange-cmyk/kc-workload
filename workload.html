@@ -50,21 +50,30 @@
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
   td.slot.dragover{background:#26405e;outline:2px dashed var(--s-planned);outline-offset:-2px}
   tbody tr:nth-child(even) td.name{background:#12181f}
+  tbody tr.row-unassigned td{background:#191f2a;border-top:2px solid var(--s-planned)}
+  tbody tr.row-unassigned td.name{background:#1d2533}
 
-  .chip{position:relative;display:block;border-radius:5px;padding:4px 7px 4px 12px;
+  .chip{position:relative;display:block;border-radius:5px;padding:4px 14px 4px 16px;
     margin-bottom:3px;font-size:12px;line-height:1.2;font-weight:500;color:#0d1117;
     cursor:grab;user-select:none;overflow:hidden}
   .chip:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.dragging{opacity:.4}
-  .chip.cont{opacity:.85}
+  .chip.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
+  .chip.cont .pbar{display:none}
   .chip .pbar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:5px 0 0 5px}
   .chip .prio{display:inline-block;width:9px;height:9px;border-radius:50%;
     margin-right:6px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
   .chip .cname{font-weight:600;pointer-events:none}
   .chip small{display:block;font-size:10px;opacity:.72;font-weight:600;pointer-events:none}
-  .chip .grip{position:absolute;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:2}
-  .chip .grip.l{left:0} .chip .grip.r{right:0}
-  .chip .grip:hover{background:rgba(255,255,255,.35)}
+  .chip .grip{position:absolute;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:3;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,.20);opacity:.6;transition:opacity .12s,background .12s}
+  .chip .grip::before{content:"";width:2px;height:55%;background:#0d1117;opacity:.55;
+    box-shadow:3px 0 0 #0d1117,-3px 0 0 #0d1117}
+  .chip .grip.l{left:0;border-radius:5px 0 0 5px}
+  .chip .grip.r{right:0;border-radius:0 5px 5px 0}
+  .chip:hover .grip{opacity:.95}
+  .chip .grip:hover{background:rgba(255,255,255,.6);opacity:1}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
   .s-planned{background:var(--s-planned);color:#fff} .s-standby{background:var(--s-standby);color:#fff}
@@ -131,7 +140,7 @@
   <div class="banner" id="banner">Mode démo — données d'exemple. Renseignez l'URL du Worker pour charger les vraies tâches.</div>
   <div class="layout">
     <div class="wrap"><table id="grid"></table></div>
-    <div class="unplanned" id="unplanned"><h2>Non planifiées</h2><div id="unplanned-list"></div></div>
+    <div class="unplanned" id="unplanned"><h2>Backlog · sans date</h2><div id="unplanned-list"></div></div>
   </div>
 
   <div class="scrim" id="scrim"></div>
@@ -166,7 +175,7 @@ const CONFIG={
     {label:"Jean-Luc L", ids:["104791763"], match:["Jean-Luc Lacaze","Jean-Luc.Lacaze@kc-lab.fr"]},
     {label:"Fred L",     ids:["104842886"], match:["Fred Le Gouallec","fred.legouallec@kc-lab.fr"]}
   ],
-  workerUrl:"https://kc-monday.charles-dorange.workers.dev",
+  workerUrl:"",
   refreshMs:5*60*1000
 };
 const STATUS_CLASS={"Working on it":"s-working","Done":"s-done","Stuck":"s-stuck",
@@ -245,7 +254,10 @@ function demoItems(){
     mk(8,"Remontage Accastillage Mat","Fons D",2,"AM",4,"PM","Planned","When possible"),
     mk(10,"Mat 2","Ludovic B",0,"AM",5,"PM","Working on it","Before next Sailing"),
     mk(11,"Batten Bridge","Jean-Luc L",2,"AM",3,"PM","Planned","On hold"),
-    mk(12,"Foil Flap","Ben T",3,"PM",5,"AM","Planned","Before Dock Out")
+    mk(12,"Foil Flap","Ben T",3,"PM",5,"AM","Planned","Before Dock Out"),
+    {id:13,name:"Lamination cover (non attribuée)",person:null,
+     start:day(1),startHalf:"AM",end:day(2),endHalf:"PM",status:"Planned",priority:"When possible",
+     description:"",how:"",files:[],url:"#"}
   ];
 }
 function demoUnplanned(){
@@ -278,12 +290,19 @@ function normalize(apiItems){
     const base={id:it.id,name:it.name,status,priority,url:it.url,files,
       description:get("description"),how:get("how_we_fixed_it_"),
       startHour,endHour};
-    if(start && labels.length){
+    if(start){
+      // tâche datée : va dans la grille. Avec personne(s) -> une ligne chacune ;
+      // sans personne -> ligne virtuelle "Non attribué" (person:null).
       const startHalf=halfFromHour(startHour,true);
       const endHalf=halfFromHour(endHour,false);
-      for(const p of labels)
-        planned.push({...base,person:p,start,end:end||start,startHalf,endHalf});
+      if(labels.length){
+        for(const p of labels)
+          planned.push({...base,person:p,start,end:end||start,startHalf,endHalf});
+      }else{
+        planned.push({...base,person:null,start,end:end||start,startHalf,endHalf});
+      }
     }else{
+      // pas de date du tout -> backlog "Non planifiées"
       unplanned.push({...base,person:labels[0]||null});
     }
   }
@@ -308,13 +327,17 @@ async function load(){
 
 /* ===================== RENDU ===================== */
 function statusClass(s){return STATUS_CLASS[s]||"s-none";}
-function peopleRows(){return CONFIG.people.map(p=>p.label);}
+const UNASSIGNED="◇ Non attribué"; // ligne virtuelle en bas de grille
+function peopleRows(){return CONFIG.people.map(p=>p.label).concat([UNASSIGNED]);}
+// clé de ligne pour une tâche (null -> ligne non attribué)
+function rowKeyOf(person){return person||UNASSIGNED;}
 
 function chipHTML(t,opts){
   opts=opts||{};
   const pc=PRIO[t.priority]?PRIO[t.priority][1]:"transparent";
   const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
-  const grips=opts.grips?`<span class="grip l" data-grip="l"></span><span class="grip r" data-grip="r"></span>`:"";
+  const grips=(opts.gripL?`<span class="grip l" data-grip="l"></span>`:"")
+            +(opts.gripR?`<span class="grip r" data-grip="r"></span>`:"");
   return `<span class="chip ${statusClass(t.status)}${opts.cont?' cont':''}" draggable="true"
     data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
     <span class="pbar" style="background:${pc}"></span>${grips}${badge}<span class="cname">${esc(t.name)}</span>`+
@@ -327,11 +350,12 @@ function render(){
   // index : personne -> slotKey -> [{task,isStart}]
   const byCell={};
   for(const it of ITEMS){
-    if(!it.person||!it.start)continue;
+    if(!it.start)continue; // les tâches sans personne MAIS datées sont incluses
+    const row=rowKeyOf(it.person);
     const slots=slotsBetween(it.start,it.startHalf||"AM",it.end||it.start,it.endHalf||"PM");
     slots.forEach((s,i)=>{
-      const key=it.person+"||"+slotKey(s.date,s.half);
-      (byCell[key]=byCell[key]||[]).push({task:it,isStart:i===0});
+      const key=row+"||"+slotKey(s.date,s.half);
+      (byCell[key]=byCell[key]||[]).push({task:it,isStart:i===0,isEnd:i===slots.length-1});
     });
   }
   // entête : 2 niveaux (jour, puis AM/PM)
@@ -343,14 +367,15 @@ function render(){
     html+=`<th class="ampm ${we?'weekend':''} ${td?'today':''}">AM</th><th class="ampm ${we?'weekend':''} ${td?'today':''}">PM</th>`;});
   html+="</tr></thead><tbody>";
   for(const person of rows){
-    html+=`<tr><td class="name">${esc(person)}</td>`;
+    const isUnassigned=(person===UNASSIGNED);
+    html+=`<tr${isUnassigned?' class="row-unassigned"':''}><td class="name"${isUnassigned?' style="color:var(--s-planned);font-style:italic"':''}>${esc(person)}</td>`;
     days.forEach((d,i)=>{
       const we=i>=5,td=dayIso[i]===todayIso;
       ["AM","PM"].forEach(half=>{
         const cellTasks=byCell[person+"||"+slotKey(dayIso[i],half)]||[];
         let inner="";
         for(const ct of cellTasks)
-          inner+=chipHTML(ct.task,{cont:!ct.isStart,grips:ct.isStart});
+          inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd});
         html+=`<td class="slot ${half==='PM'?'pm':''} ${we?'weekend':''} ${td?'today':''}"
           data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}">${inner}</td>`;
       });
@@ -477,7 +502,8 @@ function onDropSlot(person,date,half){
   const it=findTask(id);if(!it)return;
 
   if(mode==="move"){
-    // calcule la durée en slots, repositionne le début sur (date,half), garde personne cible
+    // ligne "Non attribué" -> cible sans personne (targetPerson=null)
+    const targetPerson=(person===UNASSIGNED)?null:person;
     let nbSlots=1;
     if(it.start){
       nbSlots=slotsBetween(it.start,it.startHalf||"AM",it.end||it.start,it.endHalf||"PM").length;
@@ -485,13 +511,12 @@ function onDropSlot(person,date,half){
     const startSlot={date,half};
     const seq=expandSlots(startSlot,nbSlots);
     const endSlot=seq[seq.length-1];
-    applySchedule(it,person,startSlot,endSlot);
+    applySchedule(it,targetPerson,startSlot,endSlot);
   }else if(mode==="resizeR"){
-    // étend/réduit la fin jusqu'à (date,half), même personne, même début
     if(!it.start)return;
     const s={date:it.start,half:it.startHalf||"AM"};
     const e={date,half};
-    if(slotIndex(e)<slotIndex(s)) return; // fin avant début : ignore
+    if(slotIndex(e)<slotIndex(s)) return;
     applySchedule(it,it.person,s,e);
   }else if(mode==="resizeL"){
     if(!it.start)return;
@@ -516,36 +541,38 @@ function expandSlots(start,n){
   return out;
 }
 
-/* ---- applique une nouvelle planif (optimiste + écriture Monday) ---- */
+/* ---- applique une nouvelle planif (optimiste + écriture Monday) ----
+   person : label technicien, ou null = retirer l'attribution.
+   Passer undefined pour "ne pas toucher à la personne" (resize). */
 async function applySchedule(it,person,startSlot,endSlot){
   const from=startSlot.date,to=endSlot.date;
   const startHour=startSlot.half==="AM"?CONFIG.AM.start:CONFIG.PM.start;
   const endHour=endSlot.half==="AM"?CONFIG.AM.end:CONFIG.PM.end;
-  // snapshot pour rollback
   const snap={...it};
-  const personChanged=(person&&person!==it.person);
+  const touchPerson=(person!==undefined);       // resize -> undefined -> on ne touche pas
+  const personChanged=touchPerson && (person!==it.person);
 
   // maj optimiste locale
-  it.person=person||it.person;it.start=from;it.end=to;
+  if(touchPerson) it.person=person;             // peut être null (non attribué)
+  it.start=from;it.end=to;
   it.startHalf=startSlot.half;it.endHalf=endSlot.half;
-  // si la tâche venait des non planifiées
   if(UNPLANNED.includes(it)){UNPLANNED=UNPLANNED.filter(x=>x!==it);ITEMS.push(it);}
   render();
 
-  if(usingDemo){toast("Démo : déplacement (non écrit)");return;}
+  if(usingDemo){toast(person===null?"Démo : non attribué":"Démo : déplacement");return;}
   try{
     const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({itemId:Number(it.id),from,to,startHour,endHour})});
     if(!r.ok)throw new Error(await r.text());
     if(personChanged){
-      const ids=LABEL_TO_IDS[person]||[];
+      const ids=(person===null)?[]:(LABEL_TO_IDS[person]||[]);
       const rp=await fetch(CONFIG.workerUrl+"/person",{method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({itemId:Number(it.id),personIds:ids})});
       if(!rp.ok)throw new Error(await rp.text());
     }
-    toast("Enregistré dans Monday");
+    toast(person===null?"Désattribué — dates conservées":"Enregistré dans Monday");
   }catch(e){
     console.error(e);
     Object.assign(it,snap);render();toast("Échec — remis en place");
