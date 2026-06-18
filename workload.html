@@ -444,8 +444,11 @@ function render(){
       ["AM","PM"].forEach(half=>{
         const cellTasks=byCell[person+"||"+slotKey(dayIso[i],half)]||[];
         let inner="";
-        for(const ct of cellTasks)
-          inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd});
+        // Pas de chips sur le weekend
+        if(!we){
+          for(const ct of cellTasks)
+            inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd});
+        }
         html+=`<td class="slot ${half==='PM'?'pm':''} ${we?'weekend':''} ${td?'today':''}"
           data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}">${inner}</td>`;
       });
@@ -551,7 +554,7 @@ function bindDnD(){
   // griffes de resize : on intercepte le mousedown pour mode resize
   document.querySelectorAll(".chip .grip,.chip-prio .grip").forEach(g=>{
     g.addEventListener("mousedown",e=>{
-      const chip=g.closest(".chip");
+      const chip=g.closest(".chip,.chip-prio");
       dragState={id:chip.dataset.id,mode:g.dataset.grip==="l"?"resizeL":"resizeR"};
       e.stopPropagation();
     });
