@@ -12,8 +12,8 @@
     --s-working:#fdab3d; --s-done:#00c875; --s-stuck:#df2f4a;
     --s-check:#ff6d3b; --s-planned:#579bfc; --s-standby:#007eb5;
     --s-test:#bb3354; --s-valid:#ff007f; --s-none:#3a4450;
-    --p-dock:#bb3354; --p-sail:#333333; --p-when:#401694;
-    --p-nice:#5559df; --p-hold:#579bfc;
+    --p-dock:#e63946; --p-sail:#ff6b35; --p-when:#f7b538;
+    --p-nice:#7ec8e3; --p-hold:#b0b0b0;
     --font:"Inter","Segoe UI",system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
@@ -53,27 +53,28 @@
   tbody tr.row-unassigned td{background:#191f2a;border-top:2px solid var(--s-planned)}
   tbody tr.row-unassigned td.name{background:#1d2533}
 
-  .chip{position:relative;display:block;border-radius:5px;padding:4px 14px 4px 16px;
+  .chip,.chip-prio{position:relative;display:block;border-radius:5px;padding:4px 14px 4px 16px;
     margin-bottom:3px;font-size:12px;line-height:1.2;font-weight:500;color:#0d1117;
     cursor:grab;user-select:none;overflow:hidden}
-  .chip:hover{outline:2px solid rgba(255,255,255,.5)}
-  .chip.dragging{opacity:.4}
-  .chip.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
-  .chip.cont .pbar{display:none}
-  .chip .pbar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:5px 0 0 5px}
-  .chip .prio{display:inline-block;width:9px;height:9px;border-radius:50%;
+  .chip:hover,.chip-prio:hover{outline:2px solid rgba(255,255,255,.5)}
+  .chip.dragging,.chip-prio.dragging{opacity:.4}
+  .chip.cont,.chip-prio.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
+  .chip.cont .pbar,.chip-prio.cont .pbar{display:none}
+  .chip .pbar,.chip-prio .pbar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:5px 0 0 5px}
+  .chip .prio,.chip-prio .prio{display:inline-block;width:9px;height:9px;border-radius:50%;
     margin-right:6px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
-  .chip .cname{font-weight:600;pointer-events:none}
-  .chip small{display:block;font-size:10px;opacity:.72;font-weight:600;pointer-events:none}
-  .chip .grip{position:absolute;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:3;
+  .chip .cname,.chip-prio .cname{font-weight:600;pointer-events:none}
+  .chip small,.chip-prio small{display:block;font-size:10px;opacity:.72;font-weight:600;pointer-events:none}
+  .chip .grip,.chip-prio .grip{position:absolute;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:3;
     display:flex;align-items:center;justify-content:center;
     background:rgba(0,0,0,.20);opacity:.6;transition:opacity .12s,background .12s}
-  .chip .grip::before{content:"";width:2px;height:55%;background:#0d1117;opacity:.55;
+  .chip .grip::before,.chip-prio .grip::before{content:"";width:2px;height:55%;background:#0d1117;opacity:.55;
     box-shadow:3px 0 0 #0d1117,-3px 0 0 #0d1117}
-  .chip .grip.l{left:0;border-radius:5px 0 0 5px}
-  .chip .grip.r{right:0;border-radius:0 5px 5px 0}
-  .chip:hover .grip{opacity:.95}
-  .chip .grip:hover{background:rgba(255,255,255,.6);opacity:1}
+  .chip .grip.l,.chip-prio .grip.l{left:0;border-radius:5px 0 0 5px}
+  .chip .grip.r,.chip-prio .grip.r{right:0;border-radius:0 5px 5px 0}
+  .chip:hover .grip,.chip-prio:hover .grip{opacity:.95}
+  .chip .grip:hover,.chip-prio .grip:hover{background:rgba(255,255,255,.6);opacity:1}
+  .chip-prio .pbar{display:none}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
   .s-planned{background:var(--s-planned);color:#fff} .s-standby{background:var(--s-standby);color:#fff}
@@ -81,12 +82,18 @@
   .s-none{background:var(--s-none);color:#cfd6dd}
 
   /* zone non planifiées */
-  .unplanned{width:200px;flex:none;background:var(--panel);border-left:1px solid var(--grid);
+  .sidebar-right{display:flex;flex:none}
+  .unplanned{width:180px;flex:none;background:var(--panel);border-left:1px solid var(--grid);
     overflow:auto;padding:8px}
   .unplanned h2{font-size:12px;text-transform:uppercase;letter-spacing:.6px;
     color:var(--ink-dim);margin-bottom:8px}
   .unplanned.dragover{outline:2px dashed var(--s-planned);outline-offset:-4px}
-  .unplanned .chip{cursor:grab}
+  .unplanned .chip,.unplanned .chip-prio{cursor:grab}
+  .sort-btns{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
+  .sort-btn{background:var(--head);color:var(--ink-dim);border:1px solid var(--grid);
+    border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer;font-family:var(--font)}
+  .sort-btn:hover{background:var(--grid)}
+  .sort-btn.active{background:var(--s-planned);color:#fff;border-color:var(--s-planned)}
 
   .banner{background:#3a2d10;color:#ffcf7a;font-size:12px;padding:6px 18px;
     border-bottom:1px solid var(--grid);text-align:center}
@@ -140,7 +147,22 @@
   <div class="banner" id="banner">Mode démo — données d'exemple. Renseignez l'URL du Worker pour charger les vraies tâches.</div>
   <div class="layout">
     <div class="wrap"><table id="grid"></table></div>
-    <div class="unplanned" id="unplanned"><h2>Backlog · sans date</h2><div id="unplanned-list"></div></div>
+    <div class="sidebar-right">
+      <div class="unplanned" id="toplan-panel">
+        <h2>À planifier</h2>
+        <div id="to-plan-list"></div>
+      </div>
+      <div class="unplanned" id="unplanned">
+        <h2>Backlog · sans date</h2>
+        <div class="sort-btns" id="sort-btns">
+          <button class="sort-btn active" data-sort="priority">Priorité</button>
+          <button class="sort-btn" data-sort="status">Statut</button>
+          <button class="sort-btn" data-sort="dept">Dept</button>
+          <button class="sort-btn" data-sort="date">Date</button>
+        </div>
+        <div id="unplanned-list"></div>
+      </div>
+    </div>
   </div>
 
   <div class="scrim" id="scrim"></div>
@@ -184,10 +206,13 @@ const STATUS_CLASS={"Working on it":"s-working","Done":"s-done","Stuck":"s-stuck
   "Waiting For Approval":"s-valid","Aborted":"s-none","Duplicated task":"s-none"};
 const STATUS_OPTIONS=["Working on it","Planned","To be checked","Testing & Validation",
   "Sailors validation","Done","Stuck","Standby","Aborted"];
-const LEGEND=[["Working on it","s-working"],["Planned","s-planned"],["Done","s-done"],
-  ["Stuck","s-stuck"],["To be checked","s-check"],["Sans statut","s-none"]];
-const PRIO={"Before Dock Out":["BDO","var(--p-dock)"],"Before next Sailing":["BNS","var(--p-sail)"],
-  "When possible":["WP","var(--p-when)"],"Nice to have":["NTH","var(--p-nice)"],"On hold":["HOLD","var(--p-hold)"]};
+const PRIO={
+  "Before docking out":["BDO","var(--p-dock)"],"Before Dock Out":["BDO","var(--p-dock)"],
+  "Before next sailing":["BNS","var(--p-sail)"],"Before next Sailing":["BNS","var(--p-sail)"],
+  "When possible":["WP","var(--p-when)"],
+  "Nice to have":["NTH","var(--p-nice)"],
+  "On hold":["HOLD","var(--p-hold)"]
+};
 const statusColor=s=>getComputedStyle(document.documentElement)
   .getPropertyValue("--"+((STATUS_CLASS[s])||"s-none")).trim()||"#3a4450";
 
@@ -224,6 +249,8 @@ let weekStart=mondayOf(new Date());
 let ITEMS=[];     // tâches normalisées planifiées (1 par personne)
 let UNPLANNED=[]; // tâches sans date ou sans personne
 let RAW={},usingDemo=false,refreshTimer=null,dragLock=false;
+let backlogSort="priority"; // priority | status | dept | date
+const PRIO_ORDER=["before docking out","before dock out","before next sailing","when possible","nice to have","on hold",""];
 
 /* ===================== INDEX PERSONNES ===================== */
 const ID_INDEX={},NAME_INDEX={},LABEL_TO_IDS={};
@@ -246,24 +273,24 @@ function demoItems(){
     description:"",how:"",files:[],
     url:"https://k-challenge.monday.com/boards/5098586993/pulses/"+id});
   return [
-    mk(1,"Coin de voile","Mathieu P",0,"AM",2,"PM","Working on it","Before Dock Out"),
-    mk(2,"Ajustage Barrel","Antoine B",0,"AM",1,"PM","Working on it","Before next Sailing"),
-    mk(4,"Foil Belt Fairing","Antoine B",2,"AM",3,"AM","Planned","Before Dock Out"),
-    mk(5,"Cockpit/siege","Kevin L",0,"AM",4,"PM","Working on it","Before next Sailing"),
-    mk(7,"Foil Hinges+Seal Port","Philippe E",1,"PM",1,"PM","To be checked","Before Dock Out"),
-    mk(8,"Remontage Accastillage Mat","Fons D",2,"AM",4,"PM","Planned","When possible"),
-    mk(10,"Mat 2","Ludovic B",0,"AM",5,"PM","Working on it","Before next Sailing"),
-    mk(11,"Batten Bridge","Jean-Luc L",2,"AM",3,"PM","Planned","On hold"),
-    mk(12,"Foil Flap","Ben T",3,"PM",5,"AM","Planned","Before Dock Out"),
+    mk(1,"Coin de voile","Mathieu P",0,"AM",2,"PM","Working on it","Before docking out"),
+    mk(2,"Ajustage Barrel","Antoine B",0,"AM",1,"PM","Working on it","Before next sailing"),
+    mk(4,"Foil Belt Fairing","Antoine B",2,"AM",3,"AM","Working on it","Before docking out"),
+    mk(5,"Cockpit/siege","Kevin L",0,"AM",4,"PM","Working on it","Before next sailing"),
+    mk(7,"Foil Hinges+Seal Port","Philippe E",1,"PM",1,"PM","Working on it","Before docking out"),
+    mk(8,"Remontage Accastillage Mat","Fons D",2,"AM",4,"PM","Working on it","When possible"),
+    mk(10,"Mat 2","Ludovic B",0,"AM",5,"PM","Working on it","Before next sailing"),
+    mk(11,"Batten Bridge","Jean-Luc L",2,"AM",3,"PM","Working on it","On hold"),
+    mk(12,"Foil Flap","Ben T",3,"PM",5,"AM","Working on it","Nice to have"),
     {id:13,name:"Lamination cover (non attribuée)",person:null,
-     start:day(1),startHalf:"AM",end:day(2),endHalf:"PM",status:"Planned",priority:"When possible",
+     start:day(1),startHalf:"AM",end:day(2),endHalf:"PM",status:"Working on it",priority:"When possible",
      description:"",how:"",files:[],url:"#"}
   ];
 }
 function demoUnplanned(){
   return [
-    {id:90,name:"Build Accumulator End Cap x2",person:null,status:"",priority:"Nice to have",files:[],description:"",how:"",url:"#"},
-    {id:91,name:"New implementation of lidar",person:null,status:"",priority:"On hold",files:[],description:"",how:"",url:"#"}
+    {id:90,name:"Build Accumulator End Cap x2",person:null,status:"",priority:"Nice to have",department:"Platform",files:[],description:"",how:"",url:"#"},
+    {id:91,name:"New implementation of lidar",person:null,status:"",priority:"On hold",department:"Electronics",files:[],description:"",how:"",url:"#"}
   ];
 }
 
@@ -287,7 +314,8 @@ function normalize(apiItems){
     let labels=personIds.map(resolveById).filter(Boolean);
     if(!labels.length) labels=personText.split(",").map(s=>resolvePerson(s.trim())).filter(Boolean);
     labels=[...new Set(labels)];
-    const base={id:it.id,name:it.name,status,priority,url:it.url,files,
+    const dept=get("label")||get("color_mm4dwak2")||"";
+    const base={id:it.id,name:it.name,status,priority,department:dept,url:it.url,files,
       description:get("description"),how:get("how_we_fixed_it_"),
       startHour,endHour};
     if(start){
@@ -332,13 +360,35 @@ function peopleRows(){return CONFIG.people.map(p=>p.label).concat([UNASSIGNED]);
 // clé de ligne pour une tâche (null -> ligne non attribué)
 function rowKeyOf(person){return person||UNASSIGNED;}
 
+function sortUnplanned(list){
+  const cpy=[...list];
+  if(backlogSort==="priority"){
+    cpy.sort((a,b)=>{
+      const ai=PRIO_ORDER.indexOf((a.priority||"").toLowerCase());
+      const bi=PRIO_ORDER.indexOf((b.priority||"").toLowerCase());
+      return (ai<0?99:ai)-(bi<0?99:bi);
+    });
+  }else if(backlogSort==="status"){
+    cpy.sort((a,b)=>(a.status||"").localeCompare(b.status||""));
+  }else if(backlogSort==="dept"){
+    cpy.sort((a,b)=>(a.department||"").localeCompare(b.department||""));
+  }else if(backlogSort==="date"){
+    cpy.sort((a,b)=>Number(b.id)-Number(a.id)); // id plus grand = plus récent
+  }
+  return cpy;
+}
+
 function chipHTML(t,opts){
   opts=opts||{};
   const pc=PRIO[t.priority]?PRIO[t.priority][1]:"transparent";
+  const isScheduled=!!t.start;
   const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
   const grips=(opts.gripL?`<span class="grip l" data-grip="l"></span>`:"")
             +(opts.gripR?`<span class="grip r" data-grip="r"></span>`:"");
-  return `<span class="chip ${statusClass(t.status)}${opts.cont?' cont':''}" draggable="true"
+  // Couleur: priorité si planifié, sinon statut
+  const chipClass=isScheduled?"chip-prio":"chip "+statusClass(t.status);
+  const prioStyle=isScheduled?`style="background:${pc};${["var(--p-sail)","var(--p-when)","var(--p-nice)"].includes(pc)?"":"color:#0d1117"}"`:"";
+  return `<span class="${chipClass}${opts.cont?' cont':''}" ${prioStyle} draggable="true"
     data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
     <span class="pbar" style="background:${pc}"></span>${grips}${badge}<span class="cname">${esc(t.name)}</span>`+
     (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
@@ -385,9 +435,20 @@ function render(){
   html+="</tbody>";
   document.getElementById("grid").innerHTML=html;
 
-  // zone non planifiées
+  // zone non planifiées (triée, sans Standby/Aborted/To be planned)
+  const excluded=["Standby","Aborted","Planning","To be planned"];
+  const filtered=UNPLANNED.filter(t=>!excluded.includes(t.status));
+  const toPlanned=UNPLANNED.filter(t=>t.status==="Planning"||t.status==="To be planned");
+  const sorted=sortUnplanned(filtered);
   document.getElementById("unplanned-list").innerHTML=
-    UNPLANNED.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
+    sorted.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
+  document.getElementById("to-plan-list").innerHTML=
+    toPlanned.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
+  // boutons tri
+  document.querySelectorAll(".sort-btn").forEach(b=>{
+    b.classList.toggle("active",b.dataset.sort===backlogSort);
+    b.onclick=()=>{backlogSort=b.dataset.sort;render();};
+  });
 
   document.getElementById("meta").textContent=
     (usingDemo?"DÉMO · ":"")+"MàJ "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
@@ -399,7 +460,7 @@ function render(){
 /* ===================== CLIC -> PANNEAU ===================== */
 function findTask(id){return ITEMS.find(x=>String(x.id)===String(id))||UNPLANNED.find(x=>String(x.id)===String(id));}
 function bindChipClicks(){
-  document.querySelectorAll(".chip").forEach(c=>{
+  document.querySelectorAll(".chip,.chip-prio").forEach(c=>{
     c.addEventListener("click",e=>{
       if(c._wasDragged){c._wasDragged=false;return;}
       if(e.target.classList.contains("grip"))return;
@@ -460,14 +521,14 @@ function reopenIfActive(label){
 let dragState=null; // {id, mode:'move'|'resizeL'|'resizeR'}
 function bindDnD(){
   // griffes de resize : on intercepte le mousedown pour mode resize
-  document.querySelectorAll(".chip .grip").forEach(g=>{
+  document.querySelectorAll(".chip .grip,.chip-prio .grip").forEach(g=>{
     g.addEventListener("mousedown",e=>{
       const chip=g.closest(".chip");
       dragState={id:chip.dataset.id,mode:g.dataset.grip==="l"?"resizeL":"resizeR"};
       e.stopPropagation();
     });
   });
-  document.querySelectorAll(".chip").forEach(chip=>{
+  document.querySelectorAll(".chip,.chip-prio").forEach(chip=>{
     chip.addEventListener("dragstart",e=>{
       dragLock=true;chip.classList.add("dragging");
       if(!dragState)dragState={id:chip.dataset.id,mode:"move"};
@@ -552,19 +613,30 @@ async function applySchedule(it,person,startSlot,endSlot){
   const touchPerson=(person!==undefined);       // resize -> undefined -> on ne touche pas
   const personChanged=touchPerson && (person!==it.person);
 
+  // Auto-statut selon la semaine
+  const currentWeekStart=mondayOf(new Date());
+  const targetWeekStart=mondayOf(new Date(from+"T00:00:00"));
+  const isCurrentWeek=iso(currentWeekStart)===iso(targetWeekStart);
+  const newStatus=isCurrentWeek?"Working on it":"Planned";
+
   // maj optimiste locale
   if(touchPerson) it.person=person;             // peut être null (non attribué)
   it.start=from;it.end=to;
   it.startHalf=startSlot.half;it.endHalf=endSlot.half;
+  it.status=newStatus;
   if(UNPLANNED.includes(it)){UNPLANNED=UNPLANNED.filter(x=>x!==it);ITEMS.push(it);}
   render();
 
-  if(usingDemo){toast(person===null?"Démo : non attribué":"Démo : déplacement");return;}
+  if(usingDemo){toast(person===null?"Démo : non attribué":"Démo : "+newStatus);return;}
   try{
     const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({itemId:Number(it.id),from,to,startHour,endHour})});
     if(!r.ok)throw new Error(await r.text());
+    // Maj statut auto
+    await fetch(CONFIG.workerUrl+"/status",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({itemId:Number(it.id),label:newStatus})});
     if(personChanged){
       const ids=(person===null)?[]:(LABEL_TO_IDS[person]||[]);
       const rp=await fetch(CONFIG.workerUrl+"/person",{method:"POST",
@@ -596,12 +668,17 @@ function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t
   clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2600);}
 
 /* ===================== INIT ===================== */
+// Légende priorités uniquement (sans doublons)
+const prioLegend=[
+  ["Before docking out","var(--p-dock)"],
+  ["Before next sailing","var(--p-sail)"],
+  ["When possible","var(--p-when)"],
+  ["Nice to have","var(--p-nice)"],
+  ["On hold","var(--p-hold)"]
+];
 document.getElementById("legend").innerHTML=
-  LEGEND.map(([l,c])=>`<span><i class="${c}"></i>${l}</span>`).join("")
-  +`<span style="margin-left:6px;padding-left:12px;border-left:1px solid var(--grid)">`
-  +Object.entries(PRIO).map(([full,[ab,col]])=>
-     `<span style="margin-right:10px"><i style="background:${col};border-radius:50%"></i>${full}</span>`).join("")
-  +`</span>`;
+  prioLegend.map(([label,col])=>
+    `<span style="margin-right:10px"><i style="background:${col};border-radius:50%"></i>${label}</span>`).join("");
 document.getElementById("prev").onclick=()=>{weekStart.setDate(weekStart.getDate()-7);weekStart=new Date(weekStart);render();};
 document.getElementById("next").onclick=()=>{weekStart.setDate(weekStart.getDate()+7);weekStart=new Date(weekStart);render();};
 document.getElementById("today-btn").onclick=()=>{weekStart=mondayOf(new Date());render();};
