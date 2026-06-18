@@ -94,6 +94,10 @@
     border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer;font-family:var(--font)}
   .sort-btn:hover{background:var(--grid)}
   .sort-btn.active{background:var(--s-planned);color:#fff;border-color:var(--s-planned)}
+  .dept-filter{width:100%;margin-bottom:8px;padding:4px 6px;font-size:11px;
+    background:var(--head);color:var(--ink);border:1px solid var(--grid);border-radius:4px;
+    font-family:var(--font);cursor:pointer}
+  .dept-filter:focus{outline:1px solid var(--s-planned)}
 
   .banner{background:#3a2d10;color:#ffcf7a;font-size:12px;padding:6px 18px;
     border-bottom:1px solid var(--grid);text-align:center}
@@ -150,10 +154,24 @@
     <div class="sidebar-right">
       <div class="unplanned" id="toplan-panel">
         <h2>À planifier</h2>
+        <select class="dept-filter" id="toplan-dept-filter">
+          <option value="">Tous depts</option>
+          <option value="Platform">Platform</option>
+          <option value="Hydraulics">Hydraulics</option>
+          <option value="Rigging">Rigging</option>
+          <option value="Appendages">Appendages</option>
+        </select>
         <div id="to-plan-list"></div>
       </div>
       <div class="unplanned" id="unplanned">
         <h2>Backlog · sans date</h2>
+        <select class="dept-filter" id="backlog-dept-filter">
+          <option value="">Tous depts</option>
+          <option value="Platform">Platform</option>
+          <option value="Hydraulics">Hydraulics</option>
+          <option value="Rigging">Rigging</option>
+          <option value="Appendages">Appendages</option>
+        </select>
         <div class="sort-btns" id="sort-btns">
           <button class="sort-btn active" data-sort="priority">Priorité</button>
           <button class="sort-btn" data-sort="status">Statut</button>
@@ -250,6 +268,8 @@ let ITEMS=[];     // tâches normalisées planifiées (1 par personne)
 let UNPLANNED=[]; // tâches sans date ou sans personne
 let RAW={},usingDemo=false,refreshTimer=null,dragLock=false;
 let backlogSort="priority"; // priority | status | dept | date
+let backlogDeptFilter="";
+let toplanDeptFilter="";
 const PRIO_ORDER=["before docking out","before dock out","before next sailing","when possible","nice to have","on hold",""];
 
 /* ===================== INDEX PERSONNES ===================== */
@@ -380,7 +400,7 @@ function sortUnplanned(list){
 
 function chipHTML(t,opts){
   opts=opts||{};
-  const pc=PRIO[t.priority]?PRIO[t.priority][1]:"transparent";
+  const pc=PRIO[t.priority]?PRIO[t.priority][1]:"#d0d0d0";
   const isScheduled=!!t.start;
   const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
   const grips=(opts.gripL?`<span class="grip l" data-grip="l"></span>`:"")
@@ -437,13 +457,21 @@ function render(){
 
   // zone non planifiées (triée, sans Standby/Aborted/To be planned)
   const excluded=["Standby","Aborted","Planning","To be planned"];
-  const filtered=UNPLANNED.filter(t=>!excluded.includes(t.status));
-  const toPlanned=UNPLANNED.filter(t=>t.status==="Planning"||t.status==="To be planned");
+  let filtered=UNPLANNED.filter(t=>!excluded.includes(t.status));
+  let toPlanned=UNPLANNED.filter(t=>t.status==="Planning"||t.status==="To be planned");
+  // Filtres département
+  if(backlogDeptFilter) filtered=filtered.filter(t=>t.department===backlogDeptFilter);
+  if(toplanDeptFilter) toPlanned=toPlanned.filter(t=>t.department===toplanDeptFilter);
   const sorted=sortUnplanned(filtered);
   document.getElementById("unplanned-list").innerHTML=
     sorted.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
   document.getElementById("to-plan-list").innerHTML=
     toPlanned.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
+  // Event listeners filtres
+  document.getElementById("backlog-dept-filter").value=backlogDeptFilter;
+  document.getElementById("backlog-dept-filter").onchange=e=>{backlogDeptFilter=e.target.value;render();};
+  document.getElementById("toplan-dept-filter").value=toplanDeptFilter;
+  document.getElementById("toplan-dept-filter").onchange=e=>{toplanDeptFilter=e.target.value;render();};
   // boutons tri
   document.querySelectorAll(".sort-btn").forEach(b=>{
     b.classList.toggle("active",b.dataset.sort===backlogSort);
