@@ -38,13 +38,28 @@
   th,td{border:1px solid var(--grid);vertical-align:top}
   thead th{position:sticky;top:0;z-index:3;background:var(--head);
     padding:6px 4px;font-size:13px;font-weight:600;text-align:center}
-  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:12px;width:120px}
+  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:12px;width:140px}
   thead th .dow{display:block;font-size:11px;color:var(--ink-dim);font-weight:500}
   thead th.today{background:var(--today);color:#fff}
   thead th.weekend,thead th.weekend .dow{color:#6b7686}
   thead th.ampm{font-size:10px;color:var(--ink-dim);font-weight:600;padding:2px}
   td.name{position:sticky;left:0;z-index:2;background:var(--panel);
-    font-weight:600;font-size:13px;padding:6px 12px;width:120px}
+    font-weight:600;font-size:13px;padding:6px 8px;width:140px;cursor:pointer}
+  td.name:hover{background:var(--head)}
+  td.slot.day-off{background:#2d1f1f !important}
+  td.slot.day-off::after{content:"✕";position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);font-size:18px;color:#5a3a3a;pointer-events:none}
+  td.slot{position:relative}
+  .days-off-popup{position:fixed;background:var(--panel);
+    border:1px solid var(--grid);border-radius:6px;padding:10px 12px;z-index:100;
+    min-width:140px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+  .days-off-popup .popup-title{font-size:10px;text-transform:uppercase;
+    color:var(--ink-dim);margin-bottom:8px;letter-spacing:.5px}
+  .days-off-popup label{display:flex;align-items:center;gap:8px;padding:5px 0;
+    font-size:13px;cursor:pointer;color:var(--ink)}
+  .days-off-popup label:hover{color:#fff}
+  .days-off-popup input[type="checkbox"]{width:16px;height:16px;accent-color:var(--s-stuck);cursor:pointer}
+  .days-off-popup .day-checked{color:var(--s-stuck);text-decoration:line-through}
   td.slot{padding:3px;height:64px;background:var(--slot)}
   td.slot.pm{background:#11161d}
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
@@ -145,7 +160,7 @@
       <button id="prev">‹ Sem.</button>
       <button id="today-btn">Aujourd'hui</button>
       <button id="next">Sem. ›</button>
-      <div class="meta" id="meta">—</div>
+            <div class="meta" id="meta">—</div>
     </div>
   </div>
   <div class="banner" id="banner">Mode démo — données d'exemple. Renseignez l'URL du Worker pour charger les vraies tâches.</div>
@@ -200,20 +215,20 @@ const CONFIG={
   // créneaux demi-journée
   AM:{start:"08:00",end:"12:00"},
   PM:{start:"13:00",end:"17:00"},
-  people:[
-    {label:"Antoine B",  ids:["101235282"], match:["Antoine Ballot"]},
-    {label:"Mathieu P",  ids:["104764134"], match:["Mathieu Perramant"]},
-    {label:"Kevin L",    ids:["104764538"], match:["Kevin Le Guelvoud","kevin.leguelvoud@kc-lab.fr"]},
-    {label:"Philippe E", ids:["104763862"], match:["Philippe Echassoux","philippe echassoux"]},
-    {label:"Fons D",     ids:["104765010"], match:["Fons Dorrestijn","Fonz"]},
-    {label:"Antoine R",  ids:["44355583"],  match:["Antoine Rucard"]},
-    {label:"Germain R",  ids:["100629130"], match:["Germain Rucard"]},
-    {label:"Jan C",      ids:["56054463"],  match:["Jan Chudzik"]},
-    {label:"Simon B",    ids:["104844013"], match:["Simon Bird"]},
-    {label:"Ben T",      ids:["47130240"],  match:["Ben Tapper"]},
-    {label:"Ludovic B",  ids:["101234917"], match:["Ludovic Bosser","ludo.bosser@gmail.com"]},
-    {label:"Jean-Luc L", ids:["104791763"], match:["Jean-Luc Lacaze","Jean-Luc.Lacaze@kc-lab.fr"]},
-    {label:"Fred L",     ids:["104842886"], match:["Fred Le Gouallec","fred.legouallec@kc-lab.fr"]}
+    people:[
+    {label:"Antoine B",  ids:["101235282"], match:["Antoine Ballot"], daysOff:[0,6]},
+    {label:"Mathieu P",  ids:["104764134"], match:["Mathieu Perramant"], daysOff:[0,6]},
+    {label:"Kevin L",    ids:["104764538"], match:["Kevin Le Guelvoud","kevin.leguelvoud@kc-lab.fr"], daysOff:[0,6]},
+    {label:"Philippe E", ids:["104763862"], match:["Philippe Echassoux","philippe echassoux"], daysOff:[0,6]},
+    {label:"Fons D",     ids:["104765010"], match:["Fons Dorrestijn","Fonz"], daysOff:[0,6]},
+    {label:"Antoine R",  ids:["44355583"],  match:["Antoine Rucard"], daysOff:[0,6]},
+    {label:"Germain R",  ids:["100629130"], match:["Germain Rucard"], daysOff:[0,6]},
+    {label:"Jan C",      ids:["56054463"],  match:["Jan Chudzik"], daysOff:[0,6]},
+    {label:"Simon B",    ids:["104844013"], match:["Simon Bird"], daysOff:[0,6]},
+    {label:"Ben T",      ids:["47130240"],  match:["Ben Tapper"], daysOff:[0,6]},
+    {label:"Ludovic B",  ids:["101234917"], match:["Ludovic Bosser","ludo.bosser@gmail.com"], daysOff:[0,6]},
+    {label:"Jean-Luc L", ids:["104791763"], match:["Jean-Luc Lacaze","Jean-Luc.Lacaze@kc-lab.fr"], daysOff:[0,6]},
+    {label:"Fred L",     ids:["104842886"], match:["Fred Le Gouallec","fred.legouallec@kc-lab.fr"], daysOff:[0,6]}
   ],
   workerUrl:"https://kc-monday.charles-dorange.workers.dev",
   refreshMs:5*60*1000
@@ -273,12 +288,14 @@ let toplanDeptFilter="";
 const PRIO_ORDER=["before docking out","before dock out","before next sailing","when possible","nice to have","on hold",""];
 
 /* ===================== INDEX PERSONNES ===================== */
-const ID_INDEX={},NAME_INDEX={},LABEL_TO_IDS={};
+const ID_INDEX={},NAME_INDEX={},LABEL_TO_IDS={},DAYS_OFF={};
+// Jours : 0=Dim, 1=Lun, 2=Mar, 3=Mer, 4=Jeu, 5=Ven, 6=Sam
 for(const p of CONFIG.people){
   (p.ids||[]).forEach(id=>ID_INDEX[String(id)]=p.label);
   (p.match||[]).forEach(m=>NAME_INDEX[String(m).trim().toLowerCase()]=p.label);
   NAME_INDEX[p.label.trim().toLowerCase()]=p.label;
   LABEL_TO_IDS[p.label]=p.ids||[];
+  DAYS_OFF[p.label]=new Set(p.daysOff||[0,6]); // défaut samedi + dimanche off
 }
 const resolveById=id=>ID_INDEX[String(id)]||null;
 const resolvePerson=raw=>raw?(NAME_INDEX[String(raw).trim().toLowerCase()]||null):null;
@@ -438,18 +455,23 @@ function render(){
   html+="</tr></thead><tbody>";
   for(const person of rows){
     const isUnassigned=(person===UNASSIGNED);
-    html+=`<tr${isUnassigned?' class="row-unassigned"':''}><td class="name"${isUnassigned?' style="color:var(--s-planned);font-style:italic"':''}>${esc(person)}</td>`;
+    const personDaysOff=DAYS_OFF[person]||new Set([0,6]);
+    html+=`<tr${isUnassigned?' class="row-unassigned"':''}><td class="name" data-person="${esc(person)}"${isUnassigned?' style="color:var(--s-planned);font-style:italic;cursor:default"':''}>${esc(person)}</td>`;
     days.forEach((d,i)=>{
-      const we=i>=5,td=dayIso[i]===todayIso;
+      // i: 0=Lun, 1=Mar, ... 6=Dim dans notre affichage
+      // Convertir en jour JS: Lun=1, Mar=2, ... Dim=0
+      const jsDow=(i+1)%7; // 0=Lun->1, 6=Dim->0
+      const isDayOff=personDaysOff.has(jsDow);
+      const isSat=i===5,isSun=i===6,we=isSat||isSun,td=dayIso[i]===todayIso;
       ["AM","PM"].forEach(half=>{
         const cellTasks=byCell[person+"||"+slotKey(dayIso[i],half)]||[];
         let inner="";
-        // Pas de chips sur le weekend
-        if(!we){
+        // N'affiche pas les chips si c'est un jour off pour cette personne
+        if(!isDayOff){
           for(const ct of cellTasks)
             inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd});
         }
-        html+=`<td class="slot ${half==='PM'?'pm':''} ${we?'weekend':''} ${td?'today':''}"
+        html+=`<td class="slot ${half==='PM'?'pm':''} ${we?'weekend':''} ${td?'today':''} ${isDayOff?'day-off':''}"
           data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}">${inner}</td>`;
       });
     });
@@ -486,6 +508,57 @@ function render(){
 
   bindChipClicks();
   bindDnD();
+  bindDaysOffPopup();
+}
+
+/* ---- Popup jours off ---- */
+let currentPopup=null;
+function closeDaysOffPopup(e){
+  if(currentPopup){
+    if(e&&currentPopup.contains(e.target))return; // clic dans le popup
+    currentPopup.remove();currentPopup=null;
+    document.removeEventListener("click",closeDaysOffPopup);
+    render(); // re-render pour appliquer les changements
+  }
+}
+function bindDaysOffPopup(){
+  document.querySelectorAll("td.name[data-person]").forEach(td=>{
+    if(td.dataset.person===UNASSIGNED)return;
+    td.onclick=e=>{
+      e.stopPropagation();
+      if(currentPopup){closeDaysOffPopup();return;}
+      const person=td.dataset.person;
+      const daysOff=DAYS_OFF[person]||new Set();
+      const popup=document.createElement("div");
+      popup.className="days-off-popup";
+      const dayNames=["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+      popup.innerHTML=`<div class="popup-title">Jours off — ${person}</div>`+
+        dayNames.map((name,idx)=>{
+          const isOff=daysOff.has(idx);
+          return `<label class="${isOff?'day-checked':''}">
+            <input type="checkbox" data-day="${idx}" ${isOff?'checked':''}>
+            <span>${name}</span>
+          </label>`;
+        }).join("");
+      // Position fixe près du clic
+      const rect=td.getBoundingClientRect();
+      popup.style.top=(rect.bottom+4)+"px";
+      popup.style.left=(rect.left)+"px";
+      document.body.appendChild(popup);
+      currentPopup=popup;
+      popup.querySelectorAll("input").forEach(cb=>{
+        cb.onchange=()=>{
+          const day=Number(cb.dataset.day);
+          if(cb.checked)DAYS_OFF[person].add(day);
+          else DAYS_OFF[person].delete(day);
+          // Met à jour le style du label
+          cb.parentElement.classList.toggle("day-checked",cb.checked);
+        };
+      });
+      // Ferme sur clic ailleurs (avec délai pour éviter fermeture immédiate)
+      setTimeout(()=>document.addEventListener("click",closeDaysOffPopup),10);
+    };
+  });
 }
 
 /* ===================== CLIC -> PANNEAU ===================== */
@@ -550,48 +623,197 @@ function reopenIfActive(label){
 
 /* ===================== DRAG & DROP ===================== */
 let dragState=null; // {id, mode:'move'|'resizeL'|'resizeR'}
-function bindDnD(){
-  // griffes de resize : on intercepte le mousedown pour mode resize
-  document.querySelectorAll(".chip .grip,.chip-prio .grip").forEach(g=>{
-    g.addEventListener("mousedown",e=>{
-      const chip=g.closest(".chip,.chip-prio");
-      dragState={id:chip.dataset.id,mode:g.dataset.grip==="l"?"resizeL":"resizeR"};
-      e.stopPropagation();
-    });
+let gripPending=null; // temporaire : set par mousedown sur grip, consommé par dragstart
+let overflowTarget=null; // {date,half,person} si le curseur dépasse la grille vers la droite
+
+// Nettoie gripPending si on clique sans faire de drag
+document.addEventListener("mouseup",()=>{setTimeout(()=>{gripPending=null;},50);});
+
+// Détection dépassement grille (pour resize vers semaine suivante)
+document.addEventListener("dragover",e=>{
+  if(!dragState||dragState.mode==="move"){overflowTarget=null;return;}
+  const grid=document.getElementById("grid");
+  const rect=grid.getBoundingClientRect();
+  // Vérifie si on est au-delà du bord droit de la grille
+  if(e.clientX>rect.right-10){
+    // Estime la largeur d'un slot
+    const slots=document.querySelectorAll("td.slot");
+    if(!slots.length){overflowTarget=null;return;}
+    const slotWidth=slots[0].offsetWidth||60;
+    const overflow=e.clientX-rect.right+10;
+    const slotsOverflow=Math.max(1,Math.ceil(overflow/slotWidth));
+    // Dernier jour visible = dimanche de weekStart
+    const days=weekDays(weekStart);
+    let targetDate=iso(days[6]);
+    let targetHalf="PM";
+    // Ajoute les slots en overflow
+    for(let i=0;i<slotsOverflow;i++){
+      if(targetHalf==="AM")targetHalf="PM";
+      else{targetHalf="AM";targetDate=addDays(targetDate,1);}
+    }
+    // Détermine la personne depuis la ligne survolée
+    let person=null;
+    const row=document.elementFromPoint(e.clientX-overflow-20,e.clientY);
+    if(row){
+      const td=row.closest("td.name");
+      if(td)person=td.textContent.trim();
+      else{const slot=row.closest("td.slot");if(slot)person=slot.dataset.person;}
+    }
+    overflowTarget={date:targetDate,half:targetHalf,person:person||UNASSIGNED};
+    // Indicateur visuel
+    document.getElementById("meta").textContent="→ "+targetDate+" "+targetHalf;
+  }else if(e.clientX<rect.left+10 && dragState.mode==="resizeL"){
+    // Dépassement vers la gauche pour resizeL
+    const slots=document.querySelectorAll("td.slot");
+    if(!slots.length){overflowTarget=null;return;}
+    const slotWidth=slots[0].offsetWidth||60;
+    const overflow=rect.left-e.clientX+10;
+    const slotsOverflow=Math.max(1,Math.ceil(overflow/slotWidth));
+    const days=weekDays(weekStart);
+    let targetDate=iso(days[0]); // Lundi
+    let targetHalf="AM";
+    for(let i=0;i<slotsOverflow;i++){
+      if(targetHalf==="PM")targetHalf="AM";
+      else{targetHalf="PM";targetDate=addDays(targetDate,-1);}
+    }
+    let person=null;
+    const row=document.elementFromPoint(rect.left+30,e.clientY);
+    if(row){
+      const td=row.closest("td.name");
+      if(td)person=td.textContent.trim();
+      else{const slot=row.closest("td.slot");if(slot)person=slot.dataset.person;}
+    }
+    overflowTarget={date:targetDate,half:targetHalf,person:person||UNASSIGNED};
+    document.getElementById("meta").textContent="← "+targetDate+" "+targetHalf;
+  }else{
+    overflowTarget=null;
+  }
+});
+
+// Délégation d'événements pour le drag & drop (setup une seule fois)
+let dndInitialized=false;
+function initDnD(){
+  if(dndInitialized)return;
+  dndInitialized=true;
+
+  // Grip mousedown - délégation sur document
+  document.addEventListener("mousedown",e=>{
+    const grip=e.target.closest(".grip");
+    if(!grip)return;
+    const chip=grip.closest(".chip,.chip-prio");
+    if(!chip)return;
+    gripPending={id:chip.dataset.id,mode:grip.dataset.grip==="l"?"resizeL":"resizeR"};
   });
-  document.querySelectorAll(".chip,.chip-prio").forEach(chip=>{
-    chip.addEventListener("dragstart",e=>{
-      dragLock=true;chip.classList.add("dragging");
-      if(!dragState)dragState={id:chip.dataset.id,mode:"move"};
-      e.dataTransfer.setData("text/plain",chip.dataset.id);
-      e.dataTransfer.effectAllowed="move";
-    });
-    chip.addEventListener("dragend",()=>{
-      chip.classList.remove("dragging");chip._wasDragged=true;
-      setTimeout(()=>{dragLock=false;},200);
-      document.querySelectorAll(".dragover").forEach(x=>x.classList.remove("dragover"));
-    });
+
+  // Chip dragstart - délégation sur document
+  document.addEventListener("dragstart",e=>{
+    const chip=e.target.closest(".chip,.chip-prio");
+    if(!chip)return;
+    dragLock=true;chip.classList.add("dragging");
+    // Récupère le slot d'origine (la cellule où se trouve cette chip)
+    const slot=chip.closest("td.slot");
+    const grabSlot=slot?{date:slot.dataset.date,half:slot.dataset.half}:null;
+    // Détermine le mode : resize si on vient d'un grip, sinon move
+    if(gripPending&&gripPending.id===chip.dataset.id){
+      dragState={id:chip.dataset.id,mode:gripPending.mode,grabSlot};
+    }else{
+      dragState={id:chip.dataset.id,mode:"move",grabSlot};
+    }
+    gripPending=null;
+    e.dataTransfer.setData("text/plain",chip.dataset.id);
+    e.dataTransfer.effectAllowed="move";
   });
-  // cibles : slots de la grille
-  document.querySelectorAll("td.slot").forEach(td=>{
-    td.addEventListener("dragover",e=>{e.preventDefault();td.classList.add("dragover");});
-    td.addEventListener("dragleave",()=>td.classList.remove("dragover"));
-    td.addEventListener("drop",e=>{
-      e.preventDefault();td.classList.remove("dragover");
-      onDropSlot(td.dataset.person,td.dataset.date,td.dataset.half);
-    });
+
+  // Chip dragend - délégation sur document
+  document.addEventListener("dragend",e=>{
+    const chip=e.target.closest(".chip,.chip-prio");
+    if(!chip)return;
+    chip.classList.remove("dragging");chip._wasDragged=true;
+    setTimeout(()=>{dragLock=false;},200);
+    document.querySelectorAll(".dragover").forEach(x=>x.classList.remove("dragover"));
+    // Si on a un overflow target (resize au-delà de la grille visible)
+    if(dragState&&overflowTarget){
+      const id=dragState.id,mode=dragState.mode;
+      const it=findTask(id);
+      if(it&&it.start){
+        // Ajuste pour le weekend (selon si la personne travaille le samedi)
+        const adj=adjustForDayOff(overflowTarget.date,overflowTarget.half,it.person);
+        // Bascule vers la semaine de la date ajustée
+        weekStart=mondayOf(new Date(adj.date+"T00:00:00"));
+        if(mode==="resizeR"){
+          const s={date:it.start,half:it.startHalf||"AM"};
+          const ee={date:adj.date,half:adj.half};
+          applySchedule(it,it.person,s,ee);
+        }else if(mode==="resizeL"){
+          const ee={date:it.end||it.start,half:it.endHalf||"PM"};
+          const s={date:adj.date,half:adj.half};
+          applySchedule(it,it.person,s,ee);
+        }
+      }
+    }
+    dragState=null;overflowTarget=null;gripPending=null;
   });
-  // cible : zone non planifiées (retirer la planif)
+
+  // Slot dragover/dragleave/drop - délégation sur la grille
+  const grid=document.getElementById("grid");
+  grid.addEventListener("dragover",e=>{
+    const td=e.target.closest("td.slot");
+    if(td){e.preventDefault();td.classList.add("dragover");}
+  });
+  grid.addEventListener("dragleave",e=>{
+    const td=e.target.closest("td.slot");
+    if(td)td.classList.remove("dragover");
+  });
+  grid.addEventListener("drop",e=>{
+    const td=e.target.closest("td.slot");
+    if(!td)return;
+    e.preventDefault();td.classList.remove("dragover");
+    onDropSlot(td.dataset.person,td.dataset.date,td.dataset.half);
+  });
+
+  // Zone non planifiées
   const uz=document.getElementById("unplanned");
   uz.addEventListener("dragover",e=>{e.preventDefault();uz.classList.add("dragover");});
   uz.addEventListener("dragleave",()=>uz.classList.remove("dragover"));
   uz.addEventListener("drop",e=>{e.preventDefault();uz.classList.remove("dragover");onDropUnplan();});
+
+  // Zone à planifier
+  const tp=document.getElementById("toplan-panel");
+  tp.addEventListener("dragover",e=>{e.preventDefault();tp.classList.add("dragover");});
+  tp.addEventListener("dragleave",()=>tp.classList.remove("dragover"));
+  tp.addEventListener("drop",e=>{e.preventDefault();tp.classList.remove("dragover");onDropUnplan();});
+}
+
+function bindDnD(){
+  initDnD(); // setup une seule fois
+}
+
+// Ajuste la date si elle tombe sur un jour off pour cette personne
+function adjustForDayOff(dateIso,half,person){
+  const daysOff=person?DAYS_OFF[person]:new Set([0,6]);
+  if(!daysOff||daysOff.size===0)return {date:dateIso,half};
+  let d=new Date(dateIso+"T00:00:00");
+  let attempts=0;
+  // Avance jusqu'à trouver un jour travaillé (max 7 jours)
+  while(daysOff.has(d.getDay())&&attempts<7){
+    d.setDate(d.getDate()+1);
+    attempts++;
+  }
+  if(attempts>0)return {date:iso(d),half:"AM"};
+  return {date:dateIso,half};
 }
 
 function onDropSlot(person,date,half){
   if(!dragState)return;
-  const id=dragState.id,mode=dragState.mode;dragState=null;
+  const id=dragState.id,mode=dragState.mode,grabSlot=dragState.grabSlot;
+  dragState=null;overflowTarget=null;
   const it=findTask(id);if(!it)return;
+
+  // Détermine la personne pour l'ajustement weekend
+  const effectivePerson=(mode==="move")?(person===UNASSIGNED?null:person):it.person;
+  // Ajuste pour le weekend
+  const adjusted=adjustForDayOff(date,half,effectivePerson);
+  date=adjusted.date;half=adjusted.half;
 
   if(mode==="move"){
     // ligne "Non attribué" -> cible sans personne (targetPerson=null)
@@ -600,10 +822,24 @@ function onDropSlot(person,date,half){
     if(it.start){
       nbSlots=slotsBetween(it.start,it.startHalf||"AM",it.end||it.start,it.endHalf||"PM").length;
     }
-    const startSlot={date,half};
-    const seq=expandSlots(startSlot,nbSlots);
+
+    // Calcule l'offset entre le slot attrapé et le début de la tâche
+    let offsetSlots=0;
+    if(grabSlot&&it.start){
+      const taskStartIdx=slotIndex({date:it.start,half:it.startHalf||"AM"});
+      const grabIdx=slotIndex(grabSlot);
+      offsetSlots=grabIdx-taskStartIdx; // nb de slots entre le début et la chip attrapée
+    }
+
+    // Le nouveau début = drop slot - offset
+    const dropIdx=slotIndex({date,half});
+    const newStartIdx=dropIdx-offsetSlots;
+    const newStartSlot=slotFromIndex(newStartIdx);
+
+    // Expand pour obtenir le nouveau end
+    const seq=expandSlots(newStartSlot,nbSlots);
     const endSlot=seq[seq.length-1];
-    applySchedule(it,targetPerson,startSlot,endSlot);
+    applySchedule(it,targetPerson,newStartSlot,endSlot);
   }else if(mode==="resizeR"){
     if(!it.start)return;
     const s={date:it.start,half:it.startHalf||"AM"};
@@ -619,7 +855,7 @@ function onDropSlot(person,date,half){
   }
 }
 function onDropUnplan(){
-  if(!dragState)return;const id=dragState.id;dragState=null;
+  if(!dragState)return;const id=dragState.id;dragState=null;overflowTarget=null;
   const it=ITEMS.find(x=>String(x.id)===String(id));if(!it)return;
   // retire la planif : vide timeline (et passe en non planifié)
   applyUnschedule(it);
@@ -627,6 +863,13 @@ function onDropUnplan(){
 
 // index absolu d'un slot pour comparaisons (jours*2 + AM/PM)
 function slotIndex(s){const d=new Date(s.date+"T00:00:00");return Math.round(d.getTime()/86400000)*2+(s.half==="PM"?1:0);}
+// inverse de slotIndex : reconvertit un index en {date, half}
+function slotFromIndex(idx){
+  const daysSinceEpoch=Math.floor(idx/2);
+  const d=new Date(daysSinceEpoch*86400000);
+  const dateStr=d.toISOString().slice(0,10);
+  return {date:dateStr,half:(idx%2===1)?"PM":"AM"};
+}
 function expandSlots(start,n){
   const out=[];let d=start.date,h=start.half;
   for(let i=0;i<n;i++){out.push({date:d,half:h});if(h==="AM")h="PM";else{h="AM";d=addDays(d,1);}}
