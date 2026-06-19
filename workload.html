@@ -154,7 +154,7 @@
 </head>
 <body>
   <div class="topbar">
-    <h1>PLATFORM <span>· Workload</span></h1>
+    <h1>Workload</h1>
     <div class="legend" id="legend"></div>
     <div class="controls">
       <button id="prev">‹ Sem.</button>
@@ -480,9 +480,10 @@ function render(){
   html+="</tbody>";
   document.getElementById("grid").innerHTML=html;
 
-  // zone non planifiées (triée, sans Standby/Aborted/To be planned)
-  const excluded=["Standby","Aborted","Planning","To be planned"];
-  let filtered=UNPLANNED.filter(t=>!excluded.includes(t.status));
+  // Backlog : inclut Standby, exclut Aborted et les "à planifier"
+  const excludedFromBacklog=["Aborted","Planning","To be planned"];
+  let filtered=UNPLANNED.filter(t=>!excludedFromBacklog.includes(t.status));
+  // À planifier : Planning ou To be planned
   let toPlanned=UNPLANNED.filter(t=>t.status==="Planning"||t.status==="To be planned");
   // Filtres département
   if(backlogDeptFilter) filtered=filtered.filter(t=>t.department===backlogDeptFilter);
@@ -771,17 +772,17 @@ function initDnD(){
     onDropSlot(td.dataset.person,td.dataset.date,td.dataset.half);
   });
 
-  // Zone non planifiées
+  // Zone Backlog (non planifiées) -> statut Standby
   const uz=document.getElementById("unplanned");
   uz.addEventListener("dragover",e=>{e.preventDefault();uz.classList.add("dragover");});
   uz.addEventListener("dragleave",()=>uz.classList.remove("dragover"));
-  uz.addEventListener("drop",e=>{e.preventDefault();uz.classList.remove("dragover");onDropUnplan();});
+  uz.addEventListener("drop",e=>{e.preventDefault();uz.classList.remove("dragover");onDropToBacklog();});
 
-  // Zone à planifier
+  // Zone À planifier -> statut To be planned
   const tp=document.getElementById("toplan-panel");
   tp.addEventListener("dragover",e=>{e.preventDefault();tp.classList.add("dragover");});
   tp.addEventListener("dragleave",()=>tp.classList.remove("dragover"));
-  tp.addEventListener("drop",e=>{e.preventDefault();tp.classList.remove("dragover");onDropUnplan();});
+  tp.addEventListener("drop",e=>{e.preventDefault();tp.classList.remove("dragover");onDropToToPlan();});
 }
 
 function bindDnD(){
@@ -854,11 +855,17 @@ function onDropSlot(person,date,half){
     applySchedule(it,it.person,s,e);
   }
 }
-function onDropUnplan(){
+function onDropToBacklog(){
   if(!dragState)return;const id=dragState.id;dragState=null;overflowTarget=null;
-  const it=ITEMS.find(x=>String(x.id)===String(id));if(!it)return;
-  // retire la planif : vide timeline (et passe en non planifié)
-  applyUnschedule(it);
+  const it=findTask(id);if(!it)return;
+  // retire la planif et passe en Standby
+  applyUnschedule(it,"Standby");
+}
+function onDropToToPlan(){
+  if(!dragState)return;const id=dragState.id;dragState=null;overflowTarget=null;
+  const it=findTask(id);if(!it)return;
+  // retire la planif et passe en To be planned
+  applyUnschedule(it,"To be planned");
 }
 
 // index absolu d'un slot pour comparaisons (jours*2 + AM/PM)
@@ -924,18 +931,44 @@ async function applySchedule(it,person,startSlot,endSlot){
     Object.assign(it,snap);render();toast("Échec — remis en place");
   }
 }
-async function applyUnschedule(it){
+async function applyUnschedule(it,newStatus){
   const snap={...it};
-  ITEMS=ITEMS.filter(x=>x!==it);it.start=null;it.end=null;UNPLANNED.push(it);render();
-  if(usingDemo){toast("Démo : retiré du planning");return;}
+  const wasInItems=ITEMS.includes(it);
+  const wasInUnplanned=UNPLANNED.includes(it);
+  // Retire des deux listes et ajoute dans UNPLANNED
+  ITEMS=ITEMS.filter(x=>x!==it);
+  UNPLANNED=UNPLANNED.filter(x=>x!==it);
+  it.start=null;it.end=null;it.person=null;
+  if(newStatus)it.status=newStatus;
+  UNPLANNED.push(it);
+  render();
+  if(usingDemo){toast("Démo : "+newStatus);return;}
   try{
     // vide la timeline
     const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({itemId:Number(it.id),from:"",to:""})});
     if(!r.ok)throw new Error(await r.text());
-    toast("Retiré du planning");
-  }catch(e){console.error(e);Object.assign(it,snap);ITEMS.push(it);UNPLANNED=UNPLANNED.filter(x=>x!==it);render();toast("Échec");}
+    // Met à jour le statut
+    if(newStatus){
+      await fetch(CONFIG.workerUrl+"/status",{method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({itemId:Number(it.id),label:newStatus})});
+    }
+    // Désattribue la personne
+    await fetch(CONFIG.workerUrl+"/person",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({itemId:Number(it.id),personIds:[]})});
+    toast(newStatus||"Retiré du planning");
+  }catch(e){
+    console.error(e);
+    Object.assign(it,snap);
+    UNPLANNED=UNPLANNED.filter(x=>x!==it);
+    if(wasInItems)ITEMS.push(it);
+    if(wasInUnplanned)UNPLANNED.push(it);
+    render();
+    toast("Échec");
+  }
 }
 
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
