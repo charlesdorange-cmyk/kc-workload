@@ -82,10 +82,9 @@
 
   .chip,.chip-prio{display:block;border-radius:3px;padding:2px 6px 2px 8px;
     font-size:8px;line-height:1.2;font-weight:500;color:#0d1117;
-    cursor:grab;user-select:none;margin-bottom:2px}
-  /* Dans la grille : hauteur fixe pour les tracks */
-  .slot-content .chip,.slot-content .chip-prio{height:17px;margin-bottom:0;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    cursor:grab;user-select:none;margin-bottom:2px;white-space:nowrap}
+  /* Dans la grille : hauteur fixe pour les tracks, texte dépasse si besoin */
+  .slot-content .chip,.slot-content .chip-prio{height:17px;margin-bottom:0;overflow:visible}
   .chip:hover,.chip-prio:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.dragging,.chip-prio.dragging{opacity:.4}
   .chip.cont,.chip-prio.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
