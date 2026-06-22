@@ -15,7 +15,6 @@
     --p-dock:#e63946; --p-sail:#ff6b35; --p-when:#f7b538;
     --p-nice:#7ec8e3; --p-hold:#b0b0b0;
     --font:"Inter","Segoe UI",system-ui,sans-serif;
-    --content-zoom:1;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -46,8 +45,8 @@
   thead th .dow{display:block;font-size:11px;color:var(--ink-dim);font-weight:500}
   thead th.today{background:var(--today);color:#fff}
   thead th.weekend,thead th.weekend .dow{color:#6b7686}
-  thead th.weekend[colspan="2"]{width:4%}
-  td.slot.weekend{width:2%}
+  thead th.weekend[colspan="2"]{width:9%}
+  td.slot.weekend{width:4.5%}
   thead th.ampm{font-size:10px;color:var(--ink-dim);font-weight:600;padding:2px}
   thead th.day-col{border-left:2px solid #3d4a5c}
   thead th.ampm.am{border-left:2px solid #3d4a5c}
@@ -71,20 +70,22 @@
   td.slot{padding:0;background:var(--slot);vertical-align:top}
   td.slot.am{border-left:2px solid #3d4a5c}
   td.slot.pm{background:#11161d}
-  /* Zoom du contenu uniquement */
-  td.slot .slot-content{zoom:var(--content-zoom);transform-origin:top left;
-    position:relative;min-height:18px}
-  /* Chips positionnées par track */
-  .chip,.chip-prio{position:absolute;left:0;right:0}
+  /* Container pour les chips */
+  td.slot .slot-content{position:relative;min-height:18px}
+  /* Chips positionnées par track SEULEMENT dans la grille */
+  .slot-content .chip,.slot-content .chip-prio{position:absolute;left:0;right:0}
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
   td.slot.dragover{background:#26405e;outline:2px dashed var(--s-planned);outline-offset:-2px}
   tbody tr:nth-child(even) td.name{background:#12181f}
   tbody tr.row-unassigned td{background:#191f2a;border-bottom:2px solid var(--s-planned)}
   tbody tr.row-unassigned td.name{background:#1d2533}
 
-  .chip,.chip-prio{display:block;border-radius:3px;padding:1px 6px 1px 8px;
-    font-size:8px;line-height:1.15;font-weight:500;color:#0d1117;height:17px;
-    cursor:grab;user-select:none;overflow:hidden}
+  .chip,.chip-prio{display:block;border-radius:3px;padding:2px 6px 2px 8px;
+    font-size:8px;line-height:1.2;font-weight:500;color:#0d1117;
+    cursor:grab;user-select:none;margin-bottom:2px}
+  /* Dans la grille : hauteur fixe pour les tracks */
+  .slot-content .chip,.slot-content .chip-prio{height:17px;margin-bottom:0;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .chip:hover,.chip-prio:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.dragging,.chip-prio.dragging{opacity:.4}
   .chip.cont,.chip-prio.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
@@ -767,13 +768,14 @@ function render(){
 
 /* ---- Zoom manuel (contenu uniquement, en-têtes fixes) ---- */
 function applyZoom(){
+  const table=document.getElementById("grid");
   const slider=document.getElementById("zoom-slider");
   const label=document.getElementById("zoom-value");
-  if(!slider)return;
-  const zoom=parseInt(slider.value,10)/100;
-  // Applique le zoom uniquement au contenu des cellules via CSS variable
-  document.documentElement.style.setProperty('--content-zoom',zoom);
-  if(label)label.textContent=slider.value+"%";
+  if(!slider||!table)return;
+  const zoomPct=parseInt(slider.value,10);
+  // Zoom CSS sur le tableau entier (en-têtes inclus, tout proportionnel)
+  table.style.zoom=String(zoomPct/100);
+  if(label)label.textContent=zoomPct+"%";
 }
 function adjustRowHeights(){applyZoom();}
 document.getElementById("zoom-slider").addEventListener("input",applyZoom);
