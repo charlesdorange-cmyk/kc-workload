@@ -15,6 +15,7 @@
     --p-dock:#e63946; --p-sail:#ff6b35; --p-when:#f7b538;
     --p-nice:#7ec8e3; --p-hold:#b0b0b0;
     --font:"Inter","Segoe UI",system-ui,sans-serif;
+    --content-zoom:1;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -40,16 +41,18 @@
   table{border-collapse:collapse;width:100%;table-layout:fixed}
   th,td{border:1px solid var(--grid);vertical-align:top}
   thead th{position:sticky;top:0;z-index:3;background:var(--head);
-    padding:6px 4px;font-size:13px;font-weight:600;text-align:center}
-  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:12px;width:140px}
+    padding:4px 2px;font-size:11px;font-weight:600;text-align:center}
+  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:8px;width:100px}
   thead th .dow{display:block;font-size:11px;color:var(--ink-dim);font-weight:500}
   thead th.today{background:var(--today);color:#fff}
   thead th.weekend,thead th.weekend .dow{color:#6b7686}
+  thead th.weekend[colspan="2"]{width:4%}
+  td.slot.weekend{width:2%}
   thead th.ampm{font-size:10px;color:var(--ink-dim);font-weight:600;padding:2px}
   thead th.day-col{border-left:2px solid #3d4a5c}
   thead th.ampm.am{border-left:2px solid #3d4a5c}
   td.name{position:sticky;left:0;z-index:2;background:var(--panel);
-    font-weight:600;font-size:13px;padding:6px 8px;width:140px;cursor:pointer;vertical-align:middle}
+    font-weight:600;font-size:11px;padding:4px 6px;width:100px;cursor:pointer;vertical-align:middle}
   td.name:hover{background:var(--head)}
   td.slot.day-off{background:#2d1f1f !important}
   td.slot.day-off::after{content:"✕";position:absolute;top:50%;left:50%;
@@ -65,17 +68,22 @@
   .days-off-popup label:hover{color:#fff}
   .days-off-popup input[type="checkbox"]{width:16px;height:16px;accent-color:var(--s-stuck);cursor:pointer}
   .days-off-popup .day-checked{color:var(--s-stuck);text-decoration:line-through}
-  td.slot{padding:3px;background:var(--slot)}
+  td.slot{padding:0;background:var(--slot);vertical-align:top}
   td.slot.am{border-left:2px solid #3d4a5c}
   td.slot.pm{background:#11161d}
+  /* Zoom du contenu uniquement */
+  td.slot .slot-content{zoom:var(--content-zoom);transform-origin:top left;
+    position:relative;min-height:18px}
+  /* Chips positionnées par track */
+  .chip,.chip-prio{position:absolute;left:0;right:0}
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
   td.slot.dragover{background:#26405e;outline:2px dashed var(--s-planned);outline-offset:-2px}
   tbody tr:nth-child(even) td.name{background:#12181f}
-  tbody tr.row-unassigned td{background:#191f2a;border-top:2px solid var(--s-planned)}
+  tbody tr.row-unassigned td{background:#191f2a;border-bottom:2px solid var(--s-planned)}
   tbody tr.row-unassigned td.name{background:#1d2533}
 
-  .chip,.chip-prio{position:relative;display:block;border-radius:4px;padding:2px 10px 2px 12px;
-    margin-bottom:2px;font-size:10px;line-height:1.2;font-weight:500;color:#0d1117;
+  .chip,.chip-prio{display:block;border-radius:3px;padding:1px 6px 1px 8px;
+    font-size:8px;line-height:1.15;font-weight:500;color:#0d1117;height:17px;
     cursor:grab;user-select:none;overflow:hidden}
   .chip:hover,.chip-prio:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.dragging,.chip-prio.dragging{opacity:.4}
@@ -85,7 +93,7 @@
   .chip .prio,.chip-prio .prio{display:inline-block;width:7px;height:7px;border-radius:50%;
     margin-right:4px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
   .chip .cname,.chip-prio .cname{font-weight:600;pointer-events:none}
-  .chip small,.chip-prio small{display:block;font-size:9px;opacity:.72;font-weight:600;pointer-events:none}
+  .chip small,.chip-prio small{display:block;font-size:7px;opacity:.72;font-weight:600;pointer-events:none}
   .chip .grip,.chip-prio .grip{position:absolute;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:3;
     display:flex;align-items:center;justify-content:center;
     background:rgba(0,0,0,.20);opacity:.6;transition:opacity .12s,background .12s}
@@ -96,12 +104,20 @@
   .chip:hover .grip,.chip-prio:hover .grip{opacity:.95}
   .chip .grip:hover,.chip-prio .grip:hover{background:rgba(255,255,255,.6);opacity:1}
   .chip-prio .pbar{display:none}
-  /* Bouton Done */
-  .done-btn{position:absolute;right:3px;top:50%;transform:translateY(-50%);
-    background:#1a7f37;color:#fff;border:none;border-radius:2px;padding:1px 4px;
-    font-size:9px;font-weight:600;cursor:pointer;opacity:0;transition:opacity .15s;z-index:4}
+  /* Boutons sur les chips */
+  .chip-buttons{position:absolute;right:2px;top:50%;transform:translateY(-50%);
+    display:flex;gap:2px;opacity:0;transition:opacity .15s;z-index:4}
+  .chip:hover .chip-buttons,.chip-prio:hover .chip-buttons{opacity:1}
+  .mark-done-btn{background:#2d5a3d;color:#fff;border:none;border-radius:2px;padding:2px 4px;
+    font-size:8px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .mark-done-btn:hover{background:#00c875}
+  .done-btn{background:#1a7f37;color:#fff;border:none;border-radius:2px;padding:2px 4px;
+    font-size:8px;font-weight:600;cursor:pointer;white-space:nowrap}
   .done-btn:hover{background:#238636}
-  .chip:hover .done-btn,.chip-prio:hover .done-btn{opacity:1}
+  /* Local Done indicator */
+  .chip.local-done,.chip-prio.local-done{outline:2px solid #00c875;outline-offset:-2px}
+  .local-done .chip-buttons{opacity:1}
+  .local-done .mark-done-btn{background:#00c875}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
   .s-planned{background:var(--s-planned);color:#fff} .s-toplan{background:#2b76e5;color:#fff}
@@ -200,7 +216,7 @@
     <h1>Workload</h1>
     <div class="legend" id="legend"></div>
     <div class="controls">
-      <label class="zoom-control"><span>Zoom</span><input type="range" id="zoom-slider" min="20" max="100" value="70"><span id="zoom-value">70%</span></label>
+      <label class="zoom-control"><span>Zoom</span><input type="range" id="zoom-slider" min="20" max="150" value="70"><span id="zoom-value">70%</span></label>
       <button id="prev">‹ Sem.</button>
       <button id="today-btn">Today</button>
       <button id="next">Sem. ›</button>
@@ -461,6 +477,24 @@ function updateLocalEvent(id,updates){
   saveLocalEvents();
 }
 
+/* ===================== LOCAL DONE (visual indicator only) ===================== */
+let LOCAL_DONE=new Set();
+try{
+  const saved=localStorage.getItem("localDone");
+  if(saved)LOCAL_DONE=new Set(JSON.parse(saved));
+}catch(e){}
+function saveLocalDone(){
+  try{localStorage.setItem("localDone",JSON.stringify([...LOCAL_DONE]));}catch(e){}
+}
+function toggleLocalDone(id){
+  const sid=String(id);
+  if(LOCAL_DONE.has(sid))LOCAL_DONE.delete(sid);
+  else LOCAL_DONE.add(sid);
+  saveLocalDone();
+  render();
+}
+function isLocalDone(id){return LOCAL_DONE.has(String(id));}
+
 /* ===================== DÉMO ===================== */
 function demoItems(){
   const mon=mondayOf(new Date());
@@ -471,9 +505,11 @@ function demoItems(){
     url:"https://k-challenge.monday.com/boards/5098586993/pulses/"+id});
   return [
     mk(1,"Coin de voile","Mathieu P",0,"AM",2,"PM","Working on it","Before docking out"),
-    mk(2,"Ajustage Barrel","Antoine B",0,"AM",1,"PM","Working on it","Before next sailing"),
-    mk(4,"Foil Belt Fairing","Antoine B",2,"AM",3,"AM","Working on it","Before docking out"),
+    mk(2,"Ajustage Barrel","Antoine B",0,"AM",2,"PM","Working on it","Before next sailing"),
+    mk(3,"Réparation coque","Antoine B",1,"AM",3,"PM","Working on it","Before docking out"), // chevauche avec Ajustage
+    mk(4,"Foil Belt Fairing","Antoine B",2,"AM",4,"AM","Working on it","When possible"), // chevauche avec les 2 précédentes
     mk(5,"Cockpit/siege","Kevin L",0,"AM",4,"PM","Working on it","Before next sailing"),
+    mk(6,"Seat repair","Kevin L",1,"PM",3,"AM","Working on it","When possible"), // chevauche avec Cockpit
     mk(7,"Foil Hinges+Seal Port","Philippe E",1,"PM",1,"PM","Working on it","Before docking out"),
     mk(8,"Remontage Accastillage Mat","Fons D",2,"AM",4,"PM","Working on it","When possible"),
     mk(10,"Mat 2","Ludovic B",0,"AM",5,"PM","Working on it","Before next sailing"),
@@ -559,7 +595,7 @@ async function load(){
 /* ===================== RENDU ===================== */
 function statusClass(s){return STATUS_CLASS[s]||"s-none";}
 const UNASSIGNED="◇ Event"; // virtual row at bottom of grid
-function peopleRows(){return CONFIG.people.map(p=>p.label).concat([UNASSIGNED]);}
+function peopleRows(){return [UNASSIGNED].concat(CONFIG.people.map(p=>p.label));}
 // clé de ligne pour une tâche (null -> ligne non attribué)
 function rowKeyOf(person){return person||UNASSIGNED;}
 
@@ -581,20 +617,28 @@ function sortUnplanned(list){
   return cpy;
 }
 
+const TRACK_HEIGHT=18; // hauteur d'un track en pixels
 function chipHTML(t,opts){
   opts=opts||{};
   const pc=PRIO[t.priority]?PRIO[t.priority][1]:"#d0d0d0";
   const isScheduled=!!t.start;
+  const localDone=isLocalDone(t.id);
+  const localDoneClass=localDone?" local-done":"";
   const grips=(opts.gripL?`<span class="grip l" data-grip="l"></span>`:"")
             +(opts.gripR?`<span class="grip r" data-grip="r"></span>`:"");
-  // Bouton Done visible seulement si planifié et pas en continuation
-  const doneBtn=(isScheduled && !opts.cont)?`<button class="done-btn" data-done="${t.id}">Archive</button>`:"";
+  // Boutons visibles seulement si planifié et pas en continuation
+  const buttons=(isScheduled && !opts.cont)?`<span class="chip-buttons">
+    <button class="mark-done-btn" data-mark="${t.id}">${localDone?'Undo':'Done'}</button>
+    <button class="done-btn" data-done="${t.id}">Archive</button>
+  </span>`:"";
   // Couleur toujours basée sur la priorité
   const textColor=["var(--p-sail)","var(--p-when)","var(--p-nice)"].includes(pc)?"color:#0d1117;":"";
-  const prioStyle=`style="background:${pc};${textColor}"`;
-  return `<span class="chip-prio${opts.cont?' cont':''}" ${prioStyle} draggable="true"
+  // Position verticale basée sur le track
+  const trackTop=(opts.track||0)*TRACK_HEIGHT;
+  const posStyle=`style="background:${pc};${textColor}top:${trackTop}px"`;
+  return `<span class="chip-prio${opts.cont?' cont':''}${localDoneClass}" ${posStyle} draggable="true"
     data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
-    ${grips}${doneBtn}<span class="cname">${esc(t.name)}</span>`+
+    ${grips}${buttons}<span class="cname">${esc(t.name)}</span>`+
     (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
 }
 
@@ -662,6 +706,10 @@ function render(){
   for(const person of rows){
     const isUnassigned=(person===UNASSIGNED);
     const personDaysOff=getDaysOff(person,weekStart);
+    // Calcule le nombre max de tracks pour cette personne cette semaine
+    const personTracks=tracksByPerson[person]||{};
+    const maxTrack=Math.max(0,...Object.values(personTracks));
+    const rowHeight=(maxTrack+1)*TRACK_HEIGHT;
     html+=`<tr${isUnassigned?' class="row-unassigned"':''}><td class="name" data-person="${esc(person)}"${isUnassigned?' style="color:var(--s-planned);font-style:italic;cursor:default"':''}>${esc(person)}</td>`;
     days.forEach((d,i)=>{
       // i: 0=Lun, 1=Mar, ... 6=Dim dans notre affichage
@@ -677,10 +725,10 @@ function render(){
         // N'affiche pas les chips si c'est un jour off pour cette personne
         if(!isDayOff){
           for(const ct of cellTasks)
-            inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd});
+            inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd,track:ct.track});
         }
         html+=`<td class="slot ${half==='AM'?'am':'pm'} ${we?'weekend':''} ${td?'today':''} ${isDayOff?'day-off':''}"
-          data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}">${inner}</td>`;
+          data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}"><div class="slot-content" style="height:${rowHeight}px">${inner}</div></td>`;
       });
     });
     html+="</tr>";
@@ -717,17 +765,15 @@ function render(){
   adjustRowHeights();
 }
 
-/* ---- Zoom manuel ---- */
+/* ---- Zoom manuel (contenu uniquement, en-têtes fixes) ---- */
 function applyZoom(){
-  const table=document.getElementById("grid");
   const slider=document.getElementById("zoom-slider");
   const label=document.getElementById("zoom-value");
-  const wrap=document.querySelector(".wrap");
-  if(!table||!slider)return;
+  if(!slider)return;
   const zoom=parseInt(slider.value,10)/100;
-  table.style.zoom=String(zoom);
+  // Applique le zoom uniquement au contenu des cellules via CSS variable
+  document.documentElement.style.setProperty('--content-zoom',zoom);
   if(label)label.textContent=slider.value+"%";
-  if(wrap)wrap.style.overflow="auto";
 }
 function adjustRowHeights(){applyZoom();}
 document.getElementById("zoom-slider").addEventListener("input",applyZoom);
@@ -869,7 +915,15 @@ document.addEventListener("keydown",e=>{
   }
 });
 
-/* ===================== BOUTON DONE ===================== */
+/* ===================== BOUTON MARK DONE (local indicator) ===================== */
+document.addEventListener("click",e=>{
+  const btn=e.target.closest(".mark-done-btn");
+  if(!btn)return;
+  e.stopPropagation();e.preventDefault();
+  toggleLocalDone(btn.dataset.mark);
+});
+
+/* ===================== BOUTON ARCHIVE ===================== */
 document.addEventListener("click",async e=>{
   const btn=e.target.closest(".done-btn");
   if(!btn)return;
