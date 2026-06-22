@@ -27,6 +27,9 @@
   .controls button{background:var(--head);color:var(--ink);border:1px solid var(--grid);
     border-radius:6px;padding:6px 12px;font-size:14px;cursor:pointer;font-family:var(--font)}
   .controls button:hover{background:var(--grid)}
+  .zoom-control{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-dim)}
+  .zoom-control input[type="range"]{width:80px;cursor:pointer}
+  #zoom-value{min-width:35px}
   .meta{font-size:11px;color:var(--ink-dim);min-width:130px;text-align:right}
   .legend{display:flex;gap:13px;flex-wrap:wrap;align-items:center}
   .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
@@ -197,10 +200,11 @@
     <h1>Workload</h1>
     <div class="legend" id="legend"></div>
     <div class="controls">
+      <label class="zoom-control"><span>Zoom</span><input type="range" id="zoom-slider" min="40" max="100" value="100"><span id="zoom-value">100%</span></label>
       <button id="prev">‹ Sem.</button>
       <button id="today-btn">Today</button>
       <button id="next">Sem. ›</button>
-            <div class="meta" id="meta">—</div>
+      <div class="meta" id="meta">—</div>
     </div>
   </div>
   <div class="banner" id="banner">Demo mode — sample data. Set the Worker URL to load real tasks.</div>
@@ -713,32 +717,20 @@ function render(){
   adjustRowHeights();
 }
 
-/* ---- Ajustement automatique (zoom) pour remplir l'écran ---- */
-function adjustRowHeights(){
-  requestAnimationFrame(()=>{
-    const wrap=document.querySelector(".wrap");
-    const table=document.getElementById("grid");
-    if(!wrap||!table)return;
-
-    // Reset zoom pour mesurer la taille réelle
-    table.style.zoom="1";
-
-    const wrapHeight=wrap.clientHeight;
-    const tableHeight=table.scrollHeight;
-
-    if(tableHeight>wrapHeight && wrapHeight>0){
-      // Calcule le zoom pour que tout rentre
-      const zoom=wrapHeight/tableHeight;
-      // Limite le zoom minimum à 0.5 pour rester lisible
-      const finalZoom=Math.max(0.5, Math.min(1, zoom));
-      table.style.zoom=String(finalZoom);
-      wrap.style.overflow=(finalZoom<=0.5)?"auto":"hidden";
-    }else{
-      table.style.zoom="1";
-      wrap.style.overflow="auto";
-    }
-  });
+/* ---- Zoom manuel ---- */
+function applyZoom(){
+  const table=document.getElementById("grid");
+  const slider=document.getElementById("zoom-slider");
+  const label=document.getElementById("zoom-value");
+  const wrap=document.querySelector(".wrap");
+  if(!table||!slider)return;
+  const zoom=parseInt(slider.value,10)/100;
+  table.style.zoom=String(zoom);
+  if(label)label.textContent=slider.value+"%";
+  if(wrap)wrap.style.overflow="auto";
 }
+function adjustRowHeights(){applyZoom();}
+document.getElementById("zoom-slider").addEventListener("input",applyZoom);
 window.addEventListener("resize",()=>adjustRowHeights());
 
 /* ---- Popup jours off ---- */
