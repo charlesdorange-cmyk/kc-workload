@@ -33,7 +33,7 @@
   .legend span{font-size:12px;color:var(--ink-dim)}
 
   .layout{display:flex;height:calc(100% - 54px)}
-  .wrap{flex:1;overflow:auto}
+  .wrap{flex:1;min-width:0;overflow:auto}
   table{border-collapse:collapse;width:100%;table-layout:fixed}
   th,td{border:1px solid var(--grid);vertical-align:top}
   thead th{position:sticky;top:0;z-index:3;background:var(--head);
@@ -713,35 +713,11 @@ function render(){
   adjustRowHeights();
 }
 
-/* ---- Ajustement automatique (scale) pour remplir l'écran ---- */
+/* ---- Ajustement automatique — scroll simple ---- */
 function adjustRowHeights(){
-  requestAnimationFrame(()=>{
-    const wrap=document.querySelector(".wrap");
-    const table=document.getElementById("grid");
-    if(!wrap||!table)return;
-
-    // Reset pour mesurer la taille réelle
-    table.style.transform="";
-    table.style.transformOrigin="top left";
-    table.style.height="";
-
-    const wrapHeight=wrap.clientHeight;
-    const tableHeight=table.scrollHeight;
-
-    if(tableHeight>wrapHeight && wrapHeight>0){
-      // Calcule le scale pour que tout rentre
-      const scale=wrapHeight/tableHeight;
-      // Limite le scale minimum à 0.55 pour rester lisible
-      const finalScale=Math.max(0.55, Math.min(1, scale));
-      table.style.transform=`scale(${finalScale})`;
-      table.style.height=(tableHeight*finalScale)+"px";
-      wrap.style.overflow="hidden";
-    }else{
-      table.style.transform="";
-      table.style.height="";
-      wrap.style.overflow="auto";
-    }
-  });
+  // Pas de scale, juste scroll si nécessaire
+  const wrap=document.querySelector(".wrap");
+  if(wrap) wrap.style.overflow="auto";
 }
 window.addEventListener("resize",()=>adjustRowHeights());
 
