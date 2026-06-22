@@ -713,11 +713,31 @@ function render(){
   adjustRowHeights();
 }
 
-/* ---- Ajustement automatique — scroll simple ---- */
+/* ---- Ajustement automatique (zoom) pour remplir l'écran ---- */
 function adjustRowHeights(){
-  // Pas de scale, juste scroll si nécessaire
-  const wrap=document.querySelector(".wrap");
-  if(wrap) wrap.style.overflow="auto";
+  requestAnimationFrame(()=>{
+    const wrap=document.querySelector(".wrap");
+    const table=document.getElementById("grid");
+    if(!wrap||!table)return;
+
+    // Reset zoom pour mesurer la taille réelle
+    table.style.zoom="1";
+
+    const wrapHeight=wrap.clientHeight;
+    const tableHeight=table.scrollHeight;
+
+    if(tableHeight>wrapHeight && wrapHeight>0){
+      // Calcule le zoom pour que tout rentre
+      const zoom=wrapHeight/tableHeight;
+      // Limite le zoom minimum à 0.5 pour rester lisible
+      const finalZoom=Math.max(0.5, Math.min(1, zoom));
+      table.style.zoom=String(finalZoom);
+      wrap.style.overflow=(finalZoom<=0.5)?"auto":"hidden";
+    }else{
+      table.style.zoom="1";
+      wrap.style.overflow="auto";
+    }
+  });
 }
 window.addEventListener("resize",()=>adjustRowHeights());
 
