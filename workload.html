@@ -43,8 +43,10 @@
   thead th.today{background:var(--today);color:#fff}
   thead th.weekend,thead th.weekend .dow{color:#6b7686}
   thead th.ampm{font-size:10px;color:var(--ink-dim);font-weight:600;padding:2px}
+  thead th.day-col{border-left:2px solid #3d4a5c}
+  thead th.ampm.am{border-left:2px solid #3d4a5c}
   td.name{position:sticky;left:0;z-index:2;background:var(--panel);
-    font-weight:600;font-size:13px;padding:6px 8px;width:140px;cursor:pointer}
+    font-weight:600;font-size:13px;padding:6px 8px;width:140px;cursor:pointer;vertical-align:middle}
   td.name:hover{background:var(--head)}
   td.slot.day-off{background:#2d1f1f !important}
   td.slot.day-off::after{content:"✕";position:absolute;top:50%;left:50%;
@@ -60,7 +62,8 @@
   .days-off-popup label:hover{color:#fff}
   .days-off-popup input[type="checkbox"]{width:16px;height:16px;accent-color:var(--s-stuck);cursor:pointer}
   .days-off-popup .day-checked{color:var(--s-stuck);text-decoration:line-through}
-  td.slot{padding:3px;height:64px;background:var(--slot)}
+  td.slot{padding:3px;background:var(--slot)}
+  td.slot.am{border-left:2px solid #3d4a5c}
   td.slot.pm{background:#11161d}
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
   td.slot.dragover{background:#26405e;outline:2px dashed var(--s-planned);outline-offset:-2px}
@@ -68,18 +71,18 @@
   tbody tr.row-unassigned td{background:#191f2a;border-top:2px solid var(--s-planned)}
   tbody tr.row-unassigned td.name{background:#1d2533}
 
-  .chip,.chip-prio{position:relative;display:block;border-radius:5px;padding:4px 14px 4px 16px;
-    margin-bottom:3px;font-size:12px;line-height:1.2;font-weight:500;color:#0d1117;
+  .chip,.chip-prio{position:relative;display:block;border-radius:4px;padding:2px 10px 2px 12px;
+    margin-bottom:2px;font-size:10px;line-height:1.2;font-weight:500;color:#0d1117;
     cursor:grab;user-select:none;overflow:hidden}
   .chip:hover,.chip-prio:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.dragging,.chip-prio.dragging{opacity:.4}
   .chip.cont,.chip-prio.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
   .chip.cont .pbar,.chip-prio.cont .pbar{display:none}
-  .chip .pbar,.chip-prio .pbar{position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:5px 0 0 5px}
-  .chip .prio,.chip-prio .prio{display:inline-block;width:9px;height:9px;border-radius:50%;
-    margin-right:6px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+  .chip .pbar,.chip-prio .pbar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+  .chip .prio,.chip-prio .prio{display:inline-block;width:7px;height:7px;border-radius:50%;
+    margin-right:4px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
   .chip .cname,.chip-prio .cname{font-weight:600;pointer-events:none}
-  .chip small,.chip-prio small{display:block;font-size:10px;opacity:.72;font-weight:600;pointer-events:none}
+  .chip small,.chip-prio small{display:block;font-size:9px;opacity:.72;font-weight:600;pointer-events:none}
   .chip .grip,.chip-prio .grip{position:absolute;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:3;
     display:flex;align-items:center;justify-content:center;
     background:rgba(0,0,0,.20);opacity:.6;transition:opacity .12s,background .12s}
@@ -90,14 +93,27 @@
   .chip:hover .grip,.chip-prio:hover .grip{opacity:.95}
   .chip .grip:hover,.chip-prio .grip:hover{background:rgba(255,255,255,.6);opacity:1}
   .chip-prio .pbar{display:none}
+  /* Bouton Done */
+  .done-btn{position:absolute;right:3px;top:50%;transform:translateY(-50%);
+    background:#1a7f37;color:#fff;border:none;border-radius:2px;padding:1px 4px;
+    font-size:9px;font-weight:600;cursor:pointer;opacity:0;transition:opacity .15s;z-index:4}
+  .done-btn:hover{background:#238636}
+  .chip:hover .done-btn,.chip-prio:hover .done-btn{opacity:1}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
-  .s-planned{background:var(--s-planned);color:#fff} .s-standby{background:var(--s-standby);color:#fff}
+  .s-planned{background:var(--s-planned);color:#fff} .s-toplan{background:#2b76e5;color:#fff}
+  .s-standby{background:var(--s-standby);color:#fff}
   .s-test{background:var(--s-test);color:#fff} .s-valid{background:var(--s-valid);color:#fff}
   .s-none{background:var(--s-none);color:#cfd6dd}
 
   /* zone non planifiées */
-  .sidebar-right{display:flex;flex:none}
+  .sidebar-right{display:flex;flex:none;position:relative}
+  .sidebar-right.collapsed .unplanned{display:none}
+  .toggle-sidebar{position:absolute;left:-28px;top:50%;transform:translateY(-50%);
+    width:24px;height:48px;background:var(--panel);border:1px solid var(--grid);
+    border-right:none;border-radius:6px 0 0 6px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink);z-index:5}
+  .toggle-sidebar:hover{background:var(--head)}
   .unplanned{width:180px;flex:none;background:var(--panel);border-left:1px solid var(--grid);
     overflow:auto;padding:8px}
   .unplanned h2{font-size:12px;text-transform:uppercase;letter-spacing:.6px;
@@ -150,6 +166,30 @@
     padding:10px 18px;border-radius:8px;font-size:13px;z-index:30;opacity:0;
     transition:opacity .2s;pointer-events:none}
   .toast.show{opacity:1}
+
+  /* Create task modal */
+  .create-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:var(--panel);border:1px solid var(--grid);border-radius:10px;
+    padding:20px 24px;z-index:25;min-width:320px;max-width:90vw;
+    box-shadow:0 10px 40px rgba(0,0,0,.6);display:none}
+  .create-modal.open{display:block}
+  .create-modal h2{font-size:16px;font-weight:700;margin-bottom:16px;color:var(--ink)}
+  .create-modal .form-row{margin-bottom:12px}
+  .create-modal label{display:block;font-size:11px;text-transform:uppercase;
+    color:var(--ink-dim);margin-bottom:4px;letter-spacing:.5px}
+  .create-modal input[type="text"],.create-modal select{width:100%;padding:8px 10px;
+    font-size:13px;background:var(--head);color:var(--ink);border:1px solid var(--grid);
+    border-radius:5px;font-family:var(--font)}
+  .create-modal input[type="text"]:focus,.create-modal select:focus{outline:1px solid var(--s-planned);border-color:var(--s-planned)}
+  .create-modal .form-info{font-size:12px;color:var(--ink-dim);margin-bottom:12px}
+  .create-modal .form-actions{display:flex;gap:10px;margin-top:18px}
+  .create-modal .btn{flex:1;padding:10px;font-size:13px;font-weight:600;border:none;
+    border-radius:6px;cursor:pointer;font-family:var(--font)}
+  .create-modal .btn-cancel{background:var(--head);color:var(--ink);border:1px solid var(--grid)}
+  .create-modal .btn-cancel:hover{background:var(--grid)}
+  .create-modal .btn-create{background:var(--s-planned);color:#fff}
+  .create-modal .btn-create:hover{background:#4a8ae8}
+  .create-modal .btn-create:disabled{opacity:.5;cursor:wait}
 </style>
 </head>
 <body>
@@ -158,38 +198,39 @@
     <div class="legend" id="legend"></div>
     <div class="controls">
       <button id="prev">‹ Sem.</button>
-      <button id="today-btn">Aujourd'hui</button>
+      <button id="today-btn">Today</button>
       <button id="next">Sem. ›</button>
             <div class="meta" id="meta">—</div>
     </div>
   </div>
-  <div class="banner" id="banner">Mode démo — données d'exemple. Renseignez l'URL du Worker pour charger les vraies tâches.</div>
+  <div class="banner" id="banner">Demo mode — sample data. Set the Worker URL to load real tasks.</div>
   <div class="layout">
     <div class="wrap"><table id="grid"></table></div>
-    <div class="sidebar-right">
-      <div class="unplanned" id="toplan-panel">
-        <h2>À planifier</h2>
-        <select class="dept-filter" id="toplan-dept-filter">
-          <option value="">Tous depts</option>
+    <div class="sidebar-right" id="sidebar-right">
+      <button class="toggle-sidebar" id="toggle-sidebar" title="Hide/Show panel">◀</button>
+      <div class="unplanned" id="unplanned">
+        <h2>Backlog</h2>
+        <select class="dept-filter" id="backlog-dept-filter">
+          <option value="">All depts</option>
           <option value="Platform">Platform</option>
           <option value="Hydraulics">Hydraulics</option>
           <option value="Rigging">Rigging</option>
           <option value="Appendages">Appendages</option>
         </select>
-        <div id="to-plan-list"></div>
-      </div>
-      <div class="unplanned" id="unplanned">
-        <h2>Backlog · sans date</h2>
-        <select class="dept-filter" id="backlog-dept-filter">
-          <option value="">Tous depts</option>
-          <option value="Platform">Platform</option>
-          <option value="Hydraulics">Hydraulics</option>
-          <option value="Rigging">Rigging</option>
-          <option value="Appendages">Appendages</option>
+        <select class="dept-filter" id="backlog-status-filter">
+          <option value="">All statuses</option>
+          <option value="To be planned">To be planned</option>
+          <option value="Planned">Planned</option>
+          <option value="Working on it">Working on it</option>
+          <option value="To be checked">To be checked</option>
+          <option value="Testing & Validation">Testing & Validation</option>
+          <option value="Sailors validation">Sailors validation</option>
+          <option value="Stuck">Stuck</option>
+          <option value="Standby">Standby</option>
         </select>
         <div class="sort-btns" id="sort-btns">
-          <button class="sort-btn active" data-sort="priority">Priorité</button>
-          <button class="sort-btn" data-sort="status">Statut</button>
+          <button class="sort-btn active" data-sort="priority">Priority</button>
+          <button class="sort-btn" data-sort="status">Status</button>
           <button class="sort-btn" data-sort="dept">Dept</button>
           <button class="sort-btn" data-sort="date">Date</button>
         </div>
@@ -206,6 +247,53 @@
   </aside>
   <div class="toast" id="toast"></div>
 
+  <!-- Create task modal -->
+  <div class="create-modal" id="create-modal">
+    <h2>New Task</h2>
+    <div class="form-info" id="create-info"></div>
+    <div class="form-row">
+      <label>Task name</label>
+      <input type="text" id="create-name" placeholder="Enter task name...">
+    </div>
+    <div class="form-row">
+      <label>Department</label>
+      <select id="create-dept">
+        <option value="">— Select —</option>
+        <option value="Platform">Platform</option>
+        <option value="Hydraulics">Hydraulics</option>
+        <option value="Rigging">Rigging</option>
+        <option value="Appendages">Appendages</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Status</label>
+      <select id="create-status">
+        <option value="To be planned">To be planned</option>
+        <option value="Planned">Planned</option>
+        <option value="Working on it">Working on it</option>
+        <option value="To be checked">To be checked</option>
+        <option value="Testing & Validation">Testing & Validation</option>
+        <option value="Sailors validation">Sailors validation</option>
+        <option value="Stuck">Stuck</option>
+        <option value="Standby">Standby</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Priority</label>
+      <select id="create-priority">
+        <option value="Not specified">Not specified</option>
+        <option value="Before docking out">Before docking out</option>
+        <option value="Before next sailing">Before next sailing</option>
+        <option value="When possible">When possible</option>
+        <option value="Nice to have">Nice to have</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-cancel" id="create-cancel">Cancel</button>
+      <button class="btn btn-create" id="create-submit">Create</button>
+    </div>
+  </div>
+
 <script>
 /* ===================== CONFIG ===================== */
 const CONFIG={
@@ -216,41 +304,41 @@ const CONFIG={
   AM:{start:"08:00",end:"12:00"},
   PM:{start:"13:00",end:"17:00"},
     people:[
-    {label:"Antoine B",  ids:["101235282"], match:["Antoine Ballot"], daysOff:[0,6]},
-    {label:"Mathieu P",  ids:["104764134"], match:["Mathieu Perramant"], daysOff:[0,6]},
-    {label:"Kevin L",    ids:["104764538"], match:["Kevin Le Guelvoud","kevin.leguelvoud@kc-lab.fr"], daysOff:[0,6]},
-    {label:"Philippe E", ids:["104763862"], match:["Philippe Echassoux","philippe echassoux"], daysOff:[0,6]},
-    {label:"Fons D",     ids:["104765010"], match:["Fons Dorrestijn","Fonz"], daysOff:[0,6]},
-    {label:"Antoine R",  ids:["44355583"],  match:["Antoine Rucard"], daysOff:[0,6]},
-    {label:"Germain R",  ids:["100629130"], match:["Germain Rucard"], daysOff:[0,6]},
-    {label:"Jan C",      ids:["56054463"],  match:["Jan Chudzik"], daysOff:[0,6]},
-    {label:"Simon B",    ids:["104844013"], match:["Simon Bird"], daysOff:[0,6]},
-    {label:"Ben T",      ids:["47130240"],  match:["Ben Tapper"], daysOff:[0,6]},
-    {label:"Ludovic B",  ids:["101234917"], match:["Ludovic Bosser","ludo.bosser@gmail.com"], daysOff:[0,6]},
-    {label:"Jean-Luc L", ids:["104791763"], match:["Jean-Luc Lacaze","Jean-Luc.Lacaze@kc-lab.fr"], daysOff:[0,6]},
-    {label:"Fred L",     ids:["104842886"], match:["Fred Le Gouallec","fred.legouallec@kc-lab.fr"], daysOff:[0,6]}
+    {label:"Antoine B",  ids:["101235282"], match:["Antoine Ballot"], daysOff:[]},
+    {label:"Mathieu P",  ids:["104764134"], match:["Mathieu Perramant"], daysOff:[]},
+    {label:"Kevin L",    ids:["104764538"], match:["Kevin Le Guelvoud","kevin.leguelvoud@kc-lab.fr"], daysOff:[]},
+    {label:"Philippe E", ids:["104763862"], match:["Philippe Echassoux","philippe echassoux"], daysOff:[]},
+    {label:"Fons D",     ids:["104765010"], match:["Fons Dorrestijn","Fonz"], daysOff:[]},
+    {label:"Antoine R",  ids:["44355583"],  match:["Antoine Rucard"], daysOff:[]},
+    {label:"Germain R",  ids:["100629130"], match:["Germain Rucard"], daysOff:[]},
+    {label:"Jan C",      ids:["56054463"],  match:["Jan Chudzik"], daysOff:[]},
+    {label:"Simon B",    ids:["104844013"], match:["Simon Bird"], daysOff:[]},
+    {label:"Ben T",      ids:["47130240"],  match:["Ben Tapper"], daysOff:[]},
+    {label:"Ludovic B",  ids:["101234917"], match:["Ludovic Bosser","ludo.bosser@gmail.com"], daysOff:[]},
+    {label:"Jean-Luc L", ids:["104791763"], match:["Jean-Luc Lacaze","Jean-Luc.Lacaze@kc-lab.fr"], daysOff:[]},
+    {label:"Fred L",     ids:["104842886"], match:["Fred Le Gouallec","fred.legouallec@kc-lab.fr"], daysOff:[]}
   ],
   workerUrl:"https://kc-monday.charles-dorange.workers.dev",
   refreshMs:5*60*1000
 };
 const STATUS_CLASS={"Working on it":"s-working","Done":"s-done","Stuck":"s-stuck",
-  "To be checked":"s-check","Planned":"s-planned","Standby":"s-standby",
+  "To be checked":"s-check","Planned":"s-planned","To be planned":"s-toplan","Standby":"s-standby",
   "Testing & Validation":"s-test","Sailors validation":"s-valid",
   "Waiting For Approval":"s-valid","Aborted":"s-none","Duplicated task":"s-none"};
-const STATUS_OPTIONS=["Working on it","Planned","To be checked","Testing & Validation",
+const STATUS_OPTIONS=["Working on it","Planned","To be planned","To be checked","Testing & Validation",
   "Sailors validation","Done","Stuck","Standby","Aborted"];
 const PRIO={
   "Before docking out":["BDO","var(--p-dock)"],"Before Dock Out":["BDO","var(--p-dock)"],
   "Before next sailing":["BNS","var(--p-sail)"],"Before next Sailing":["BNS","var(--p-sail)"],
   "When possible":["WP","var(--p-when)"],
   "Nice to have":["NTH","var(--p-nice)"],
-  "On hold":["HOLD","var(--p-hold)"]
+  "Not specified":["NS","var(--p-hold)"]
 };
 const statusColor=s=>getComputedStyle(document.documentElement)
   .getPropertyValue("--"+((STATUS_CLASS[s])||"s-none")).trim()||"#3a4450";
 
 /* ===================== DATES / SLOTS ===================== */
-const DOW=["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+const DOW=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 const fmtDay=d=>d.toLocaleDateString("fr-FR",{day:"2-digit",month:"short"});
 const iso=d=>{const z=new Date(d);z.setMinutes(z.getMinutes()-z.getTimezoneOffset());return z.toISOString().slice(0,10);};
 function mondayOf(date){const d=new Date(date);const k=(d.getDay()+6)%7;
@@ -284,22 +372,90 @@ let UNPLANNED=[]; // tâches sans date ou sans personne
 let RAW={},usingDemo=false,refreshTimer=null,dragLock=false;
 let backlogSort="priority"; // priority | status | dept | date
 let backlogDeptFilter="";
-let toplanDeptFilter="";
-const PRIO_ORDER=["before docking out","before dock out","before next sailing","when possible","nice to have","on hold",""];
+let backlogStatusFilter="";
+const PRIO_ORDER=["before docking out","before dock out","before next sailing","when possible","nice to have","not specified",""];
 
 /* ===================== INDEX PERSONNES ===================== */
-const ID_INDEX={},NAME_INDEX={},LABEL_TO_IDS={},DAYS_OFF={};
+const ID_INDEX={},NAME_INDEX={},LABEL_TO_IDS={},DEFAULT_DAYS_OFF={},DAYS_OFF_WEEKLY={};
 // Jours : 0=Dim, 1=Lun, 2=Mar, 3=Mer, 4=Jeu, 5=Ven, 6=Sam
 for(const p of CONFIG.people){
   (p.ids||[]).forEach(id=>ID_INDEX[String(id)]=p.label);
   (p.match||[]).forEach(m=>NAME_INDEX[String(m).trim().toLowerCase()]=p.label);
   NAME_INDEX[p.label.trim().toLowerCase()]=p.label;
   LABEL_TO_IDS[p.label]=p.ids||[];
-  DAYS_OFF[p.label]=new Set(p.daysOff||[0,6]); // défaut samedi + dimanche off
+  DEFAULT_DAYS_OFF[p.label]=new Set(p.daysOff||[]); // default: no days off
+  DAYS_OFF_WEEKLY[p.label]={}; // {weekKey: Set} - overrides per week
+}
+// Load days off from localStorage
+try{
+  const saved=localStorage.getItem("daysOffWeekly");
+  if(saved){
+    const parsed=JSON.parse(saved);
+    for(const person in parsed){
+      if(!DAYS_OFF_WEEKLY[person])DAYS_OFF_WEEKLY[person]={};
+      for(const weekKey in parsed[person]){
+        DAYS_OFF_WEEKLY[person][weekKey]=new Set(parsed[person][weekKey]);
+      }
+    }
+  }
+}catch(e){console.warn("Failed to load days off:",e);}
+// Save days off to localStorage
+function saveDaysOff(){
+  const toSave={};
+  for(const person in DAYS_OFF_WEEKLY){
+    toSave[person]={};
+    for(const weekKey in DAYS_OFF_WEEKLY[person]){
+      toSave[person][weekKey]=[...DAYS_OFF_WEEKLY[person][weekKey]];
+    }
+  }
+  try{localStorage.setItem("daysOffWeekly",JSON.stringify(toSave));}catch(e){}
+}
+// Get days off for a person and week
+function getDaysOff(person,weekMonday){
+  const weekKey=iso(weekMonday);
+  if(DAYS_OFF_WEEKLY[person]&&DAYS_OFF_WEEKLY[person][weekKey]){
+    return DAYS_OFF_WEEKLY[person][weekKey];
+  }
+  return DEFAULT_DAYS_OFF[person]||new Set();
+}
+// Set days off for a person and week
+function setDaysOff(person,weekMonday,daysSet){
+  const weekKey=iso(weekMonday);
+  if(!DAYS_OFF_WEEKLY[person])DAYS_OFF_WEEKLY[person]={};
+  DAYS_OFF_WEEKLY[person][weekKey]=daysSet;
+  saveDaysOff();
 }
 const resolveById=id=>ID_INDEX[String(id)]||null;
 const resolvePerson=raw=>raw?(NAME_INDEX[String(raw).trim().toLowerCase()]||null):null;
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ===================== LOCAL EVENTS (non sync Monday) ===================== */
+let LOCAL_EVENTS=[];
+let localEventIdCounter=Date.now();
+try{
+  const saved=localStorage.getItem("localEvents");
+  if(saved){
+    LOCAL_EVENTS=JSON.parse(saved);
+    // Récupère le plus grand ID pour éviter les doublons
+    LOCAL_EVENTS.forEach(e=>{if(Number(e.id)>=localEventIdCounter)localEventIdCounter=Number(e.id)+1;});
+  }
+}catch(e){console.warn("Failed to load local events:",e);}
+function saveLocalEvents(){
+  try{localStorage.setItem("localEvents",JSON.stringify(LOCAL_EVENTS));}catch(e){}
+}
+function addLocalEvent(task){
+  LOCAL_EVENTS.push(task);
+  saveLocalEvents();
+}
+function removeLocalEvent(id){
+  LOCAL_EVENTS=LOCAL_EVENTS.filter(e=>String(e.id)!==String(id));
+  saveLocalEvents();
+}
+function updateLocalEvent(id,updates){
+  const ev=LOCAL_EVENTS.find(e=>String(e.id)===String(id));
+  if(ev)Object.assign(ev,updates);
+  saveLocalEvents();
+}
 
 /* ===================== DÉMO ===================== */
 function demoItems(){
@@ -317,7 +473,7 @@ function demoItems(){
     mk(7,"Foil Hinges+Seal Port","Philippe E",1,"PM",1,"PM","Working on it","Before docking out"),
     mk(8,"Remontage Accastillage Mat","Fons D",2,"AM",4,"PM","Working on it","When possible"),
     mk(10,"Mat 2","Ludovic B",0,"AM",5,"PM","Working on it","Before next sailing"),
-    mk(11,"Batten Bridge","Jean-Luc L",2,"AM",3,"PM","Working on it","On hold"),
+    mk(11,"Batten Bridge","Jean-Luc L",2,"AM",3,"PM","Working on it","Not specified"),
     mk(12,"Foil Flap","Ben T",3,"PM",5,"AM","Working on it","Nice to have"),
     {id:13,name:"Lamination cover (non attribuée)",person:null,
      start:day(1),startHalf:"AM",end:day(2),endHalf:"PM",status:"Working on it",priority:"When possible",
@@ -327,7 +483,7 @@ function demoItems(){
 function demoUnplanned(){
   return [
     {id:90,name:"Build Accumulator End Cap x2",person:null,status:"",priority:"Nice to have",department:"Platform",files:[],description:"",how:"",url:"#"},
-    {id:91,name:"New implementation of lidar",person:null,status:"",priority:"On hold",department:"Electronics",files:[],description:"",how:"",url:"#"}
+    {id:91,name:"New implementation of lidar",person:null,status:"",priority:"Not specified",department:"Electronics",files:[],description:"",how:"",url:"#"}
   ];
 }
 
@@ -386,13 +542,19 @@ async function load(){
       ITEMS=n.planned;UNPLANNED=n.unplanned;usingDemo=false;
     }catch(e){console.warn("Worker KO -> démo:",e);ITEMS=demoItems();UNPLANNED=demoUnplanned();usingDemo=true;}
   }else{ITEMS=demoItems();UNPLANNED=demoUnplanned();usingDemo=true;}
+  // Ajoute les événements locaux (non sync Monday)
+  LOCAL_EVENTS.forEach(ev=>{
+    if(!ITEMS.find(x=>String(x.id)===String(ev.id))){
+      ITEMS.push({...ev});
+    }
+  });
   document.getElementById("banner").classList.toggle("hidden",!usingDemo);
   render();
 }
 
 /* ===================== RENDU ===================== */
 function statusClass(s){return STATUS_CLASS[s]||"s-none";}
-const UNASSIGNED="◇ Non attribué"; // ligne virtuelle en bas de grille
+const UNASSIGNED="◇ Event"; // virtual row at bottom of grid
 function peopleRows(){return CONFIG.people.map(p=>p.label).concat([UNASSIGNED]);}
 // clé de ligne pour une tâche (null -> ligne non attribué)
 function rowKeyOf(person){return person||UNASSIGNED;}
@@ -419,43 +581,83 @@ function chipHTML(t,opts){
   opts=opts||{};
   const pc=PRIO[t.priority]?PRIO[t.priority][1]:"#d0d0d0";
   const isScheduled=!!t.start;
-  const badge=t.priority?`<span class="prio" style="background:${pc}"></span>`:"";
   const grips=(opts.gripL?`<span class="grip l" data-grip="l"></span>`:"")
             +(opts.gripR?`<span class="grip r" data-grip="r"></span>`:"");
-  // Couleur: priorité si planifié, sinon statut
-  const chipClass=isScheduled?"chip-prio":"chip "+statusClass(t.status);
-  const prioStyle=isScheduled?`style="background:${pc};${["var(--p-sail)","var(--p-when)","var(--p-nice)"].includes(pc)?"":"color:#0d1117"}"`:"";
-  return `<span class="${chipClass}${opts.cont?' cont':''}" ${prioStyle} draggable="true"
+  // Bouton Done visible seulement si planifié et pas en continuation
+  const doneBtn=(isScheduled && !opts.cont)?`<button class="done-btn" data-done="${t.id}">Archive</button>`:"";
+  // Couleur toujours basée sur la priorité
+  const textColor=["var(--p-sail)","var(--p-when)","var(--p-nice)"].includes(pc)?"color:#0d1117;":"";
+  const prioStyle=`style="background:${pc};${textColor}"`;
+  return `<span class="chip-prio${opts.cont?' cont':''}" ${prioStyle} draggable="true"
     data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
-    <span class="pbar" style="background:${pc}"></span>${grips}${badge}<span class="cname">${esc(t.name)}</span>`+
+    ${grips}${doneBtn}<span class="cname">${esc(t.name)}</span>`+
     (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
+}
+
+// Calcule les tracks (pistes) pour éviter le "saut" visuel des tâches
+function computeTracks(tasks){
+  if(!tasks.length)return {};
+  // Trie par date de début
+  const sorted=[...tasks].sort((a,b)=>{
+    const aIdx=slotIndex({date:a.start,half:a.startHalf||"AM"});
+    const bIdx=slotIndex({date:b.start,half:b.startHalf||"AM"});
+    return aIdx-bIdx;
+  });
+  const trackEnds=[]; // Pour chaque track, l'index du dernier slot occupé
+  const taskTracks={}; // Map task.id -> numéro de track
+  for(const task of sorted){
+    const taskStart=slotIndex({date:task.start,half:task.startHalf||"AM"});
+    const taskEnd=slotIndex({date:task.end||task.start,half:task.endHalf||"PM"});
+    // Cherche la première track libre
+    let foundTrack=-1;
+    for(let i=0;i<trackEnds.length;i++){
+      if(taskStart>trackEnds[i]){foundTrack=i;break;}
+    }
+    if(foundTrack===-1){
+      foundTrack=trackEnds.length;
+      trackEnds.push(taskEnd);
+    }else{
+      trackEnds[foundTrack]=taskEnd;
+    }
+    taskTracks[task.id]=foundTrack;
+  }
+  return taskTracks;
 }
 
 function render(){
   const days=weekDays(weekStart),dayIso=days.map(iso),todayIso=iso(new Date());
   const rows=peopleRows();
-  // index : personne -> slotKey -> [{task,isStart}]
+
+  // Calcule les tracks par personne
+  const tracksByPerson={};
+  for(const person of rows){
+    const personTasks=ITEMS.filter(it=>rowKeyOf(it.person)===person&&it.start);
+    tracksByPerson[person]=computeTracks(personTasks);
+  }
+
+  // index : personne -> slotKey -> [{task,isStart,track}]
   const byCell={};
   for(const it of ITEMS){
-    if(!it.start)continue; // les tâches sans personne MAIS datées sont incluses
+    if(!it.start)continue;
     const row=rowKeyOf(it.person);
+    const track=tracksByPerson[row]?.[it.id]||0;
     const slots=slotsBetween(it.start,it.startHalf||"AM",it.end||it.start,it.endHalf||"PM");
     slots.forEach((s,i)=>{
       const key=row+"||"+slotKey(s.date,s.half);
-      (byCell[key]=byCell[key]||[]).push({task:it,isStart:i===0,isEnd:i===slots.length-1});
+      (byCell[key]=byCell[key]||[]).push({task:it,isStart:i===0,isEnd:i===slots.length-1,track});
     });
   }
   // entête : 2 niveaux (jour, puis AM/PM)
   let html="<thead><tr><th class='namecol' rowspan='2'>Name</th>";
   days.forEach((d,i)=>{const we=i>=5,td=dayIso[i]===todayIso;
-    html+=`<th colspan="2" class="${we?'weekend':''} ${td?'today':''}">${DOW[i]}<span class="dow">${fmtDay(d)}</span></th>`;});
+    html+=`<th colspan="2" class="day-col ${we?'weekend':''} ${td?'today':''}">${DOW[i]}<span class="dow">${fmtDay(d)}</span></th>`;});
   html+="</tr><tr>";
   days.forEach((d,i)=>{const we=i>=5,td=dayIso[i]===todayIso;
-    html+=`<th class="ampm ${we?'weekend':''} ${td?'today':''}">AM</th><th class="ampm ${we?'weekend':''} ${td?'today':''}">PM</th>`;});
+    html+=`<th class="ampm am ${we?'weekend':''} ${td?'today':''}">AM</th><th class="ampm ${we?'weekend':''} ${td?'today':''}">PM</th>`;});
   html+="</tr></thead><tbody>";
   for(const person of rows){
     const isUnassigned=(person===UNASSIGNED);
-    const personDaysOff=DAYS_OFF[person]||new Set([0,6]);
+    const personDaysOff=getDaysOff(person,weekStart);
     html+=`<tr${isUnassigned?' class="row-unassigned"':''}><td class="name" data-person="${esc(person)}"${isUnassigned?' style="color:var(--s-planned);font-style:italic;cursor:default"':''}>${esc(person)}</td>`;
     days.forEach((d,i)=>{
       // i: 0=Lun, 1=Mar, ... 6=Dim dans notre affichage
@@ -465,13 +667,15 @@ function render(){
       const isSat=i===5,isSun=i===6,we=isSat||isSun,td=dayIso[i]===todayIso;
       ["AM","PM"].forEach(half=>{
         const cellTasks=byCell[person+"||"+slotKey(dayIso[i],half)]||[];
+        // Trie par track pour un affichage stable
+        cellTasks.sort((a,b)=>a.track-b.track);
         let inner="";
         // N'affiche pas les chips si c'est un jour off pour cette personne
         if(!isDayOff){
           for(const ct of cellTasks)
             inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd});
         }
-        html+=`<td class="slot ${half==='PM'?'pm':''} ${we?'weekend':''} ${td?'today':''} ${isDayOff?'day-off':''}"
+        html+=`<td class="slot ${half==='AM'?'am':'pm'} ${we?'weekend':''} ${td?'today':''} ${isDayOff?'day-off':''}"
           data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}">${inner}</td>`;
       });
     });
@@ -480,24 +684,19 @@ function render(){
   html+="</tbody>";
   document.getElementById("grid").innerHTML=html;
 
-  // Backlog : inclut Standby, exclut Aborted et les "à planifier"
-  const excludedFromBacklog=["Aborted","Planning","To be planned"];
-  let filtered=UNPLANNED.filter(t=>!excludedFromBacklog.includes(t.status));
-  // À planifier : Planning ou To be planned
-  let toPlanned=UNPLANNED.filter(t=>t.status==="Planning"||t.status==="To be planned");
-  // Filtres département
+  // Backlog : toutes les tâches non planifiées sauf Aborted
+  let filtered=UNPLANNED.filter(t=>t.status!=="Aborted");
+  // Filtres département et statut
   if(backlogDeptFilter) filtered=filtered.filter(t=>t.department===backlogDeptFilter);
-  if(toplanDeptFilter) toPlanned=toPlanned.filter(t=>t.department===toplanDeptFilter);
+  if(backlogStatusFilter) filtered=filtered.filter(t=>t.status===backlogStatusFilter);
   const sorted=sortUnplanned(filtered);
   document.getElementById("unplanned-list").innerHTML=
-    sorted.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
-  document.getElementById("to-plan-list").innerHTML=
-    toPlanned.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:12px;color:var(--ink-dim)">Aucune</p>';
+    sorted.map(t=>chipHTML(t,{})).join("")||'<p style="font-size:10px;color:var(--ink-dim)">No tasks</p>';
   // Event listeners filtres
   document.getElementById("backlog-dept-filter").value=backlogDeptFilter;
   document.getElementById("backlog-dept-filter").onchange=e=>{backlogDeptFilter=e.target.value;render();};
-  document.getElementById("toplan-dept-filter").value=toplanDeptFilter;
-  document.getElementById("toplan-dept-filter").onchange=e=>{toplanDeptFilter=e.target.value;render();};
+  document.getElementById("backlog-status-filter").value=backlogStatusFilter;
+  document.getElementById("backlog-status-filter").onchange=e=>{backlogStatusFilter=e.target.value;render();};
   // boutons tri
   document.querySelectorAll(".sort-btn").forEach(b=>{
     b.classList.toggle("active",b.dataset.sort===backlogSort);
@@ -505,12 +704,46 @@ function render(){
   });
 
   document.getElementById("meta").textContent=
-    (usingDemo?"DÉMO · ":"")+"MàJ "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+    (usingDemo?"DEMO · ":"")+"Updated "+new Date().toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"});
 
   bindChipClicks();
   bindDnD();
   bindDaysOffPopup();
+  bindCellClick();
+  adjustRowHeights();
 }
+
+/* ---- Ajustement automatique (scale) pour remplir l'écran ---- */
+function adjustRowHeights(){
+  requestAnimationFrame(()=>{
+    const wrap=document.querySelector(".wrap");
+    const table=document.getElementById("grid");
+    if(!wrap||!table)return;
+
+    // Reset pour mesurer la taille réelle
+    table.style.transform="";
+    table.style.transformOrigin="top left";
+    table.style.height="";
+
+    const wrapHeight=wrap.clientHeight;
+    const tableHeight=table.scrollHeight;
+
+    if(tableHeight>wrapHeight && wrapHeight>0){
+      // Calcule le scale pour que tout rentre
+      const scale=wrapHeight/tableHeight;
+      // Limite le scale minimum à 0.55 pour rester lisible
+      const finalScale=Math.max(0.55, Math.min(1, scale));
+      table.style.transform=`scale(${finalScale})`;
+      table.style.height=(tableHeight*finalScale)+"px";
+      wrap.style.overflow="hidden";
+    }else{
+      table.style.transform="";
+      table.style.height="";
+      wrap.style.overflow="auto";
+    }
+  });
+}
+window.addEventListener("resize",()=>adjustRowHeights());
 
 /* ---- Popup jours off ---- */
 let currentPopup=null;
@@ -529,11 +762,12 @@ function bindDaysOffPopup(){
       e.stopPropagation();
       if(currentPopup){closeDaysOffPopup();return;}
       const person=td.dataset.person;
-      const daysOff=DAYS_OFF[person]||new Set();
+      const daysOff=getDaysOff(person,weekStart);
       const popup=document.createElement("div");
       popup.className="days-off-popup";
-      const dayNames=["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
-      popup.innerHTML=`<div class="popup-title">Jours off — ${person}</div>`+
+      const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      const weekLabel=`${iso(weekStart).slice(5)}`;
+      popup.innerHTML=`<div class="popup-title">Days off — ${person}<br><small style="opacity:.7">Week of ${weekLabel}</small></div>`+
         dayNames.map((name,idx)=>{
           const isOff=daysOff.has(idx);
           return `<label class="${isOff?'day-checked':''}">
@@ -541,19 +775,32 @@ function bindDaysOffPopup(){
             <span>${name}</span>
           </label>`;
         }).join("");
-      // Position fixe près du clic
-      const rect=td.getBoundingClientRect();
-      popup.style.top=(rect.bottom+4)+"px";
-      popup.style.left=(rect.left)+"px";
+      // Position fixe près du clic (vers le haut si pas assez de place en bas)
       document.body.appendChild(popup);
+      const rect=td.getBoundingClientRect();
+      const popupH=popup.offsetHeight;
+      const spaceBelow=window.innerHeight-rect.bottom-10;
+      const spaceAbove=rect.top-10;
+      if(spaceBelow>=popupH || spaceBelow>=spaceAbove){
+        popup.style.top=(rect.bottom+4)+"px";
+      }else{
+        popup.style.top=(rect.top-popupH-4)+"px";
+      }
+      popup.style.left=(rect.left)+"px";
       currentPopup=popup;
+      // Crée une copie locale pour cette semaine si elle n'existe pas encore
+      const weekKey=iso(weekStart);
+      if(!DAYS_OFF_WEEKLY[person][weekKey]){
+        DAYS_OFF_WEEKLY[person][weekKey]=new Set(daysOff);
+      }
       popup.querySelectorAll("input").forEach(cb=>{
         cb.onchange=()=>{
           const day=Number(cb.dataset.day);
-          if(cb.checked)DAYS_OFF[person].add(day);
-          else DAYS_OFF[person].delete(day);
-          // Met à jour le style du label
+          if(cb.checked)DAYS_OFF_WEEKLY[person][weekKey].add(day);
+          else DAYS_OFF_WEEKLY[person][weekKey].delete(day);
+          saveDaysOff(); // Save to localStorage
           cb.parentElement.classList.toggle("day-checked",cb.checked);
+          render();
         };
       });
       // Ferme sur clic ailleurs (avec délai pour éviter fermeture immédiate)
@@ -563,7 +810,7 @@ function bindDaysOffPopup(){
 }
 
 /* ===================== CLIC -> PANNEAU ===================== */
-function findTask(id){return ITEMS.find(x=>String(x.id)===String(id))||UNPLANNED.find(x=>String(x.id)===String(id));}
+function findTask(id){return ITEMS.find(x=>String(x.id)===String(id))||UNPLANNED.find(x=>String(x.id)===String(id))||LOCAL_EVENTS.find(x=>String(x.id)===String(id));}
 function bindChipClicks(){
   document.querySelectorAll(".chip,.chip-prio").forEach(c=>{
     c.addEventListener("click",e=>{
@@ -574,52 +821,268 @@ function bindChipClicks(){
   });
 }
 let currentId=null;
+const PRIO_OPTIONS=["Before docking out","Before next sailing","When possible","Nice to have","Not specified"];
 function openPanel(id){
   currentId=id;const it=findTask(id);if(!it)return;
+  const isLocal=it.isLocal||String(id).startsWith("local_");
   const det=RAW[id]||{description:it.description,how:it.how,files:it.files,url:it.url};
   document.getElementById("p-title").textContent=it.name;
-  const prio=it.priority?`<span class="pill" style="background:${PRIO[it.priority]?PRIO[it.priority][1]:'#3a4450'}">${esc(it.priority)}</span>`:'<span class="none">—</span>';
   const files=(det.files&&det.files.length)
     ?`<div class="files">${det.files.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.name)}</a>`).join("")}</div>`
-    :'<p class="none">Aucun fichier</p>';
+    :'<p class="none">No files</p>';
   const statusBtns=STATUS_OPTIONS.map(s=>{
     const active=(s===it.status)?" active":"";
     const wht=['Stuck','Standby','Testing & Validation','Sailors validation','Planned'].includes(s)?'color:#fff;':'';
     return `<button class="set-status${active}" data-label="${esc(s)}" style="background:${statusColor(s)};${wht}">${esc(s)}</button>`;
   }).join("");
+  const prioBtns=PRIO_OPTIONS.map(p=>{
+    const active=(p===it.priority||p.toLowerCase()===it.priority?.toLowerCase())?" active":"";
+    const col=PRIO[p]?PRIO[p][1]:'#3a4450';
+    return `<button class="set-prio${active}" data-label="${esc(p)}" style="background:${col}">${esc(p)}</button>`;
+  }).join("");
+  const mondaySection=isLocal?'<p class="none">Local event (not synced)</p>'
+    :`<a class="openlink" href="${esc(det.url)}" target="_blank" rel="noopener">Open in Monday ↗</a>`;
   document.getElementById("p-body").innerHTML=`
-    <h3>Statut — cliquer pour changer</h3><div class="statusgrid">${statusBtns}</div>
-    <h3>Priorité</h3>${prio}
+    <h3>Status — click to change</h3><div class="statusgrid">${statusBtns}</div>
+    <h3>Priority — click to change</h3><div class="statusgrid">${prioBtns}</div>
     <h3>Description</h3>${det.description?`<div class="txt">${esc(det.description)}</div>`:'<p class="none">—</p>'}
     <h3>How we fixed it?</h3>${det.how?`<div class="txt">${esc(det.how)}</div>`:'<p class="none">—</p>'}
-    <h3>Fichiers associés</h3>${files}
-    <h3>Monday</h3><a class="openlink" href="${esc(det.url)}" target="_blank" rel="noopener">Ouvrir dans Monday ↗</a>`;
+    <h3>Attached files</h3>${files}
+    <h3>Monday</h3>${mondaySection}`;
   document.querySelectorAll(".set-status").forEach(b=>b.onclick=()=>changeStatus(b.dataset.label));
+  document.querySelectorAll(".set-prio").forEach(b=>b.onclick=()=>changePriority(b.dataset.label));
   document.getElementById("scrim").classList.add("open");
   document.getElementById("panel").classList.add("open");
 }
-function closePanel(){document.getElementById("scrim").classList.remove("open");
-  document.getElementById("panel").classList.remove("open");currentId=null;}
+function closePanel(){
+  document.getElementById("panel").classList.remove("open");currentId=null;
+  // Ne ferme le scrim que si le modal de création n'est pas ouvert
+  const cm=document.getElementById("create-modal");
+  if(!cm||!cm.classList.contains("open"))document.getElementById("scrim").classList.remove("open");
+}
 document.getElementById("close").onclick=closePanel;
-document.getElementById("scrim").onclick=closePanel;
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closePanel();});
+document.getElementById("scrim").onclick=function(){
+  // Ferme le modal de création en priorité, sinon le panneau
+  const cm=document.getElementById("create-modal");
+  if(cm&&cm.classList.contains("open")){
+    cm.classList.remove("open");
+    if(!document.getElementById("panel").classList.contains("open"))
+      document.getElementById("scrim").classList.remove("open");
+  }else closePanel();
+};
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape"){
+    const cm=document.getElementById("create-modal");
+    if(cm&&cm.classList.contains("open")){
+      cm.classList.remove("open");
+      if(!document.getElementById("panel").classList.contains("open"))
+        document.getElementById("scrim").classList.remove("open");
+    }else closePanel();
+  }
+});
+
+/* ===================== BOUTON DONE ===================== */
+document.addEventListener("click",async e=>{
+  const btn=e.target.closest(".done-btn");
+  if(!btn)return;
+  e.stopPropagation();e.preventDefault();
+  const id=btn.dataset.done;
+  const it=findTask(id);
+  if(!it)return;
+  // Confirmation
+  if(!confirm(`Archive "${it.name}"?`))return;
+  // Local Event — pas de sync
+  if(it.isLocal||String(id).startsWith("local_")){
+    removeLocalEvent(id);
+    ITEMS=ITEMS.filter(x=>String(x.id)!==String(id));
+    render();toast("Event archived");
+    return;
+  }
+  // Mode démo
+  if(usingDemo){
+    ITEMS=ITEMS.filter(x=>x.id!==id);
+    render();toast("Demo: task archived");
+    return;
+  }
+  // Appel API
+  btn.disabled=true;btn.textContent="...";
+  try{
+    const r=await fetch(CONFIG.workerUrl+"/status",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({itemId:Number(id),label:"Done"})});
+    if(!r.ok)throw new Error(await r.text());
+    // Succès : retirer la tâche du dashboard
+    ITEMS=ITEMS.filter(x=>x.id!==id);
+    UNPLANNED=UNPLANNED.filter(x=>x.id!==id);
+    render();toast("Task archived ✓");
+  }catch(err){
+    console.error("Done error:",err);
+    toast("Error: "+err.message);
+    btn.disabled=false;btn.textContent="Archive";
+  }
+});
 
 /* ===================== CHANGER STATUT ===================== */
 async function changeStatus(label){
   if(!currentId)return;const it=findTask(currentId);
-  if(usingDemo){if(it)it.status=label;render();reopenIfActive(label);toast("Démo : statut « "+label+" »");return;}
+  const isLocal=it&&(it.isLocal||String(it.id).startsWith("local_"));
+  // Local Event — update localStorage
+  if(isLocal){
+    if(it)it.status=label;
+    updateLocalEvent(currentId,{status:label});
+    render();reopenIfActive(label);toast("Status: « "+label+" »");return;
+  }
+  if(usingDemo){if(it)it.status=label;render();reopenIfActive(label);toast("Demo: status « "+label+" »");return;}
   const btns=document.querySelectorAll(".set-status");btns.forEach(b=>b.disabled=true);
   try{
     const r=await fetch(CONFIG.workerUrl+"/status",{method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({itemId:Number(currentId),label})});
     if(!r.ok)throw new Error(await r.text());
-    if(it)it.status=label;render();reopenIfActive(label);toast("Statut : « "+label+" »");
-  }catch(e){console.error(e);toast("Échec mise à jour statut.");}
+    if(it)it.status=label;render();reopenIfActive(label);toast("Status: « "+label+" »");
+  }catch(e){console.error(e);toast("Failed to update status.");}
   finally{document.querySelectorAll(".set-status").forEach(b=>b.disabled=false);}
 }
 function reopenIfActive(label){
   document.querySelectorAll(".set-status").forEach(b=>b.classList.toggle("active",b.dataset.label===label));
+}
+
+/* ===================== CHANGER PRIORITÉ ===================== */
+async function changePriority(label){
+  if(!currentId)return;const it=findTask(currentId);
+  const isLocal=it&&(it.isLocal||String(it.id).startsWith("local_"));
+  // Local Event — update localStorage
+  if(isLocal){
+    if(it)it.priority=label;
+    updateLocalEvent(currentId,{priority:label});
+    render();reopenIfActivePrio(label);toast("Priority: « "+label+" »");return;
+  }
+  if(usingDemo){if(it)it.priority=label;render();reopenIfActivePrio(label);toast("Demo: priority « "+label+" »");return;}
+  const btns=document.querySelectorAll(".set-prio");btns.forEach(b=>b.disabled=true);
+  try{
+    const r=await fetch(CONFIG.workerUrl+"/priority",{method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({itemId:Number(currentId),label})});
+    if(!r.ok)throw new Error(await r.text());
+    if(it)it.priority=label;render();reopenIfActivePrio(label);toast("Priority: « "+label+" »");
+  }catch(e){console.error(e);toast("Failed to update priority.");}
+  finally{document.querySelectorAll(".set-prio").forEach(b=>b.disabled=false);}
+}
+function reopenIfActivePrio(label){
+  document.querySelectorAll(".set-prio").forEach(b=>b.classList.toggle("active",b.dataset.label===label||b.dataset.label.toLowerCase()===label?.toLowerCase()));
+}
+
+/* ===================== CRÉATION DE TÂCHE ===================== */
+let createContext=null; // {person, date, half}
+const createModal=document.getElementById("create-modal");
+const createInfo=document.getElementById("create-info");
+const createName=document.getElementById("create-name");
+const createDept=document.getElementById("create-dept");
+const createStatus=document.getElementById("create-status");
+const createPriority=document.getElementById("create-priority");
+const createCancel=document.getElementById("create-cancel");
+const createSubmit=document.getElementById("create-submit");
+
+function openCreateModal(person,date,half){
+  createContext={person,date,half};
+  const dayLabel=new Date(date+"T00:00:00").toLocaleDateString("en-US",{weekday:"short",day:"numeric",month:"short"});
+  createInfo.innerHTML=`<strong>${person}</strong> — ${dayLabel} ${half}`;
+  createName.value="";
+  createDept.value="Platform";
+  createStatus.value="To be planned";
+  createPriority.value="Not specified";
+  createModal.classList.add("open");
+  document.getElementById("scrim").classList.add("open");
+  setTimeout(()=>createName.focus(),50);
+}
+function closeCreateModal(){
+  createModal.classList.remove("open");
+  createContext=null;
+  // Ne ferme le scrim que si le panneau de détail n'est pas ouvert
+  if(!document.getElementById("panel").classList.contains("open"))document.getElementById("scrim").classList.remove("open");
+}
+createCancel.onclick=closeCreateModal;
+
+createSubmit.onclick=async function(){
+  const name=createName.value.trim();
+  if(!name){toast("Please enter a task name");createName.focus();return;}
+  const ctx=createContext;if(!ctx)return;
+  const isEvent=(ctx.person===UNASSIGNED);
+  const dept=createDept.value;
+  const status=createStatus.value;
+  const priority=createPriority.value;
+
+  createSubmit.disabled=true;createSubmit.textContent="Creating...";
+
+  if(isEvent){
+    // Local Event — pas de sync Monday
+    const id="local_"+(localEventIdCounter++);
+    const task={
+      id,name,person:UNASSIGNED,
+      start:ctx.date,startHalf:ctx.half,end:ctx.date,endHalf:ctx.half,
+      status,priority,dept,description:"",how:"",files:[],url:"",isLocal:true
+    };
+    addLocalEvent(task);
+    ITEMS.push(task);
+    render();toast("Event created (local)");
+    closeCreateModal();
+  }else{
+    // Sync Monday
+    if(usingDemo){
+      const id="demo_"+(localEventIdCounter++);
+      ITEMS.push({
+        id,name,person:ctx.person,
+        start:ctx.date,startHalf:ctx.half,end:ctx.date,endHalf:ctx.half,
+        status,priority,dept,description:"",how:"",files:[],url:""
+      });
+      render();toast("Demo: task created");
+      closeCreateModal();
+      createSubmit.disabled=false;createSubmit.textContent="Create";
+      return;
+    }
+    try{
+      const personIds=LABEL_TO_IDS[ctx.person]||[];
+      const startHour=ctx.half==="AM"?CONFIG.AM.start:CONFIG.PM.start;
+      const endHour=ctx.half==="AM"?CONFIG.AM.end:CONFIG.PM.end;
+      const r=await fetch(CONFIG.workerUrl+"/create",{method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          name,dept,status,priority,personIds,
+          from:ctx.date,to:ctx.date,startHour,endHour
+        })});
+      if(!r.ok)throw new Error(await r.text());
+      const data=await r.json();
+      // Ajoute la tâche localement
+      ITEMS.push({
+        id:data.id,name,person:ctx.person,
+        start:ctx.date,startHalf:ctx.half,end:ctx.date,endHalf:ctx.half,
+        status,priority,dept,description:"",how:"",files:[],url:data.url||""
+      });
+      render();toast("Task created ✓");
+      closeCreateModal();
+    }catch(e){
+      console.error("Create error:",e);
+      toast("Error: "+e.message);
+    }
+  }
+  createSubmit.disabled=false;createSubmit.textContent="Create";
+};
+
+// Clic sur espace vide d'une cellule = créer tâche
+function bindCellClick(){
+  document.querySelectorAll("td.slot").forEach(td=>{
+    td.addEventListener("click",e=>{
+      // Ignore si clic sur une chip
+      if(e.target.closest(".chip,.chip-prio"))return;
+      // Ignore si jour off
+      if(td.classList.contains("day-off"))return;
+      const person=td.dataset.person;
+      const date=td.dataset.date;
+      const half=td.dataset.half;
+      if(!person||!date||!half)return;
+      openCreateModal(person,date,half);
+    });
+  });
 }
 
 /* ===================== DRAG & DROP ===================== */
@@ -778,20 +1241,15 @@ function initDnD(){
   uz.addEventListener("dragleave",()=>uz.classList.remove("dragover"));
   uz.addEventListener("drop",e=>{e.preventDefault();uz.classList.remove("dragover");onDropToBacklog();});
 
-  // Zone À planifier -> statut To be planned
-  const tp=document.getElementById("toplan-panel");
-  tp.addEventListener("dragover",e=>{e.preventDefault();tp.classList.add("dragover");});
-  tp.addEventListener("dragleave",()=>tp.classList.remove("dragover"));
-  tp.addEventListener("drop",e=>{e.preventDefault();tp.classList.remove("dragover");onDropToToPlan();});
 }
 
 function bindDnD(){
   initDnD(); // setup une seule fois
 }
 
-// Ajuste la date si elle tombe sur un jour off pour cette personne
+// Ajuste la date si elle tombe sur un jour off pour cette personne (semaine courante)
 function adjustForDayOff(dateIso,half,person){
-  const daysOff=person?DAYS_OFF[person]:new Set([0,6]);
+  const daysOff=person?getDaysOff(person,weekStart):new Set([0,6]);
   if(!daysOff||daysOff.size===0)return {date:dateIso,half};
   let d=new Date(dateIso+"T00:00:00");
   let attempts=0;
@@ -861,12 +1319,6 @@ function onDropToBacklog(){
   // retire la planif et passe en Standby
   applyUnschedule(it,"Standby");
 }
-function onDropToToPlan(){
-  if(!dragState)return;const id=dragState.id;dragState=null;overflowTarget=null;
-  const it=findTask(id);if(!it)return;
-  // retire la planif et passe en To be planned
-  applyUnschedule(it,"To be planned");
-}
 
 // index absolu d'un slot pour comparaisons (jours*2 + AM/PM)
 function slotIndex(s){const d=new Date(s.date+"T00:00:00");return Math.round(d.getTime()/86400000)*2+(s.half==="PM"?1:0);}
@@ -893,6 +1345,7 @@ async function applySchedule(it,person,startSlot,endSlot){
   const snap={...it};
   const touchPerson=(person!==undefined);       // resize -> undefined -> on ne touche pas
   const personChanged=touchPerson && (person!==it.person);
+  const isLocal=it.isLocal||String(it.id).startsWith("local_");
 
   // Auto-statut selon la semaine
   const currentWeekStart=mondayOf(new Date());
@@ -908,7 +1361,14 @@ async function applySchedule(it,person,startSlot,endSlot){
   if(UNPLANNED.includes(it)){UNPLANNED=UNPLANNED.filter(x=>x!==it);ITEMS.push(it);}
   render();
 
-  if(usingDemo){toast(person===null?"Démo : non attribué":"Démo : "+newStatus);return;}
+  // Local Event — update localStorage only
+  if(isLocal){
+    updateLocalEvent(it.id,{start:from,end:to,startHalf:startSlot.half,endHalf:endSlot.half,
+      person:touchPerson?person:it.person,status:newStatus});
+    toast("Event updated");return;
+  }
+
+  if(usingDemo){toast(person===null?"Demo: event":"Demo: "+newStatus);return;}
   try{
     const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
       headers:{"Content-Type":"application/json"},
@@ -925,16 +1385,19 @@ async function applySchedule(it,person,startSlot,endSlot){
         body:JSON.stringify({itemId:Number(it.id),personIds:ids})});
       if(!rp.ok)throw new Error(await rp.text());
     }
-    toast(person===null?"Désattribué — dates conservées":"Enregistré dans Monday");
+    toast(person===null?"Event — dates kept":"Saved to Monday");
   }catch(e){
     console.error(e);
-    Object.assign(it,snap);render();toast("Échec — remis en place");
+    Object.assign(it,snap);render();toast("Failed — reverted");
   }
 }
 async function applyUnschedule(it,newStatus){
   const snap={...it};
   const wasInItems=ITEMS.includes(it);
   const wasInUnplanned=UNPLANNED.includes(it);
+  const hadSchedule=!!it.start; // avait une planification ?
+  const hadPerson=!!it.person;  // avait une personne ?
+
   // Retire des deux listes et ajoute dans UNPLANNED
   ITEMS=ITEMS.filter(x=>x!==it);
   UNPLANNED=UNPLANNED.filter(x=>x!==it);
@@ -942,32 +1405,49 @@ async function applyUnschedule(it,newStatus){
   if(newStatus)it.status=newStatus;
   UNPLANNED.push(it);
   render();
-  if(usingDemo){toast("Démo : "+newStatus);return;}
+
+  if(usingDemo){toast("Demo: "+newStatus);return;}
+
   try{
-    // vide la timeline
-    const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({itemId:Number(it.id),from:"",to:""})});
-    if(!r.ok)throw new Error(await r.text());
-    // Met à jour le statut
+    // Vide la timeline seulement si elle était remplie
+    if(hadSchedule){
+      const r=await fetch(CONFIG.workerUrl+"/schedule",{method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({itemId:Number(it.id),from:"",to:""})});
+      if(!r.ok){console.error("schedule error:",await r.text());}
+    }
+
+    // Met à jour le statut dans Monday
     if(newStatus){
-      await fetch(CONFIG.workerUrl+"/status",{method:"POST",
+      console.log("Updating status to:",newStatus,"for item:",it.id);
+      const rs=await fetch(CONFIG.workerUrl+"/status",{method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({itemId:Number(it.id),label:newStatus})});
+      if(!rs.ok){
+        const errText=await rs.text();
+        console.error("status error:",errText);
+        throw new Error(errText);
+      }
+      console.log("Status updated successfully");
     }
-    // Désattribue la personne
-    await fetch(CONFIG.workerUrl+"/person",{method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({itemId:Number(it.id),personIds:[]})});
-    toast(newStatus||"Retiré du planning");
+
+    // Désattribue la personne seulement si elle était attribuée
+    if(hadPerson){
+      const rp=await fetch(CONFIG.workerUrl+"/person",{method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({itemId:Number(it.id),personIds:[]})});
+      if(!rp.ok){console.error("person error:",await rp.text());}
+    }
+
+    toast(newStatus||"Removed from schedule");
   }catch(e){
-    console.error(e);
+    console.error("applyUnschedule error:",e);
     Object.assign(it,snap);
     UNPLANNED=UNPLANNED.filter(x=>x!==it);
     if(wasInItems)ITEMS.push(it);
     if(wasInUnplanned)UNPLANNED.push(it);
     render();
-    toast("Échec");
+    toast("Error: "+e.message);
   }
 }
 
@@ -981,7 +1461,7 @@ const prioLegend=[
   ["Before next sailing","var(--p-sail)"],
   ["When possible","var(--p-when)"],
   ["Nice to have","var(--p-nice)"],
-  ["On hold","var(--p-hold)"]
+  ["Not specified","var(--p-hold)"]
 ];
 document.getElementById("legend").innerHTML=
   prioLegend.map(([label,col])=>
@@ -989,6 +1469,14 @@ document.getElementById("legend").innerHTML=
 document.getElementById("prev").onclick=()=>{weekStart.setDate(weekStart.getDate()-7);weekStart=new Date(weekStart);render();};
 document.getElementById("next").onclick=()=>{weekStart.setDate(weekStart.getDate()+7);weekStart=new Date(weekStart);render();};
 document.getElementById("today-btn").onclick=()=>{weekStart=mondayOf(new Date());render();};
+// Toggle sidebar
+document.getElementById("toggle-sidebar").onclick=()=>{
+  const sb=document.getElementById("sidebar-right");
+  const btn=document.getElementById("toggle-sidebar");
+  sb.classList.toggle("collapsed");
+  btn.textContent=sb.classList.contains("collapsed")?"▶":"◀";
+  setTimeout(adjustRowHeights,250); // recalcule après animation
+};
 load();
 refreshTimer=setInterval(load,CONFIG.refreshMs);
 </script>
