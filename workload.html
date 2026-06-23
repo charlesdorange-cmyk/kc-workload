@@ -113,15 +113,16 @@
   .chip:hover .grip,.chip-prio:hover .grip{opacity:.95}
   .chip .grip:hover,.chip-prio .grip:hover{background:rgba(255,255,255,.6);opacity:1}
   .chip-prio .pbar{display:none}
-  /* Boutons sur les chips - compacts */
-  .chip-buttons{position:absolute;right:1px;top:50%;transform:translateY(-50%);
-    display:flex;gap:1px;opacity:0;transition:opacity .15s;z-index:4}
+  /* Boutons au-dessus des chips */
+  .chip-buttons{position:absolute;left:0;bottom:100%;margin-bottom:2px;
+    display:flex;gap:3px;opacity:0;transition:opacity .15s;z-index:10}
+  .slot-content .chip-buttons{transform:scale(var(--text-scale));transform-origin:left bottom}
   .chip:hover .chip-buttons,.chip-prio:hover .chip-buttons{opacity:1}
-  .mark-done-btn{background:#2d5a3d;color:#fff;border:none;border-radius:2px;padding:1px 2px;
-    font-size:6px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .mark-done-btn{background:#2d5a3d;color:#fff;border:none;border-radius:3px;padding:3px 6px;
+    font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.4)}
   .mark-done-btn:hover{background:#00c875}
-  .done-btn{background:#1a7f37;color:#fff;border:none;border-radius:2px;padding:1px 2px;
-    font-size:6px;font-weight:600;cursor:pointer;white-space:nowrap}
+  .done-btn{background:#1a7f37;color:#fff;border:none;border-radius:3px;padding:3px 6px;
+    font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.4)}
   .done-btn:hover{background:#238636}
   /* Local Done indicator */
   .chip.local-done,.chip-prio.local-done{outline:2px solid #00c875;outline-offset:-2px}
@@ -880,7 +881,7 @@ function openPanel(id){
     :'<p class="none">No files</p>';
   // Bouton local done
   const localDoneActive=isLocalDone(id);
-  const localDoneBtn=`<button class="toggle-local-done" style="background:${localDoneActive?'#00c875':'#2d5a3d'};color:#fff;border:none;border-radius:5px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px">${localDoneActive?'✓ Marked as Done':'Mark as Done'}</button>`;
+  const localDoneBtn=`<button class="toggle-local-done" style="background:${localDoneActive?'#00c875':'#2d5a3d'};color:#fff;border:none;border-radius:5px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px">${localDoneActive?'✓ Done':'Done'}</button>`;
   const statusBtns=STATUS_OPTIONS.map(s=>{
     const active=(s===it.status)?" active":"";
     const wht=['Stuck','Standby','Testing & Validation','Sailors validation','Planned'].includes(s)?'color:#fff;':'';
