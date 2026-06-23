@@ -15,7 +15,6 @@
     --p-dock:#e63946; --p-sail:#ff6b35; --p-when:#f7b538;
     --p-nice:#7ec8e3; --p-hold:#b0b0b0;
     --font:"Inter","Segoe UI",system-ui,sans-serif;
-    --text-scale:1;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -42,7 +41,7 @@
   th,td{border:1px solid var(--grid);vertical-align:top}
   thead th{position:sticky;top:0;z-index:3;background:var(--head);
     padding:4px 2px;font-size:11px;font-weight:600;text-align:center}
-  thead th .th-text,thead th .dow{display:inline-block;transform:scale(var(--text-scale));transform-origin:center center}
+  thead th .th-text,thead th .dow{display:inline-block}
   thead th.namecol{z-index:4;left:0;text-align:left;padding-left:8px;width:100px}
   thead th.namecol .th-text{transform-origin:left center}
   thead th .dow{display:block;font-size:11px;color:var(--ink-dim);font-weight:500}
@@ -55,7 +54,7 @@
   thead th.ampm.am{border-left:2px solid #3d4a5c}
   td.name{position:sticky;left:0;z-index:2;background:var(--panel);
     font-weight:600;font-size:11px;padding:4px 6px;width:100px;cursor:pointer;vertical-align:middle}
-  td.name span{display:inline-block;transform:scale(var(--text-scale));transform-origin:left center}
+  td.name span{display:inline-block}
   td.name:hover{background:var(--head)}
   td.slot.day-off{background:#2d1f1f !important}
   td.slot.day-off::after{content:"✕";position:absolute;top:50%;left:50%;
@@ -74,35 +73,32 @@
   td.slot{padding:0;background:var(--slot);vertical-align:top}
   td.slot.am{border-left:2px solid #3d4a5c}
   td.slot.pm{background:#11161d}
-  /* Container pour les chips */
-  td.slot .slot-content{position:relative;min-height:18px}
-  /* Chips positionnées par track SEULEMENT dans la grille */
-  .slot-content .chip,.slot-content .chip-prio{position:absolute;left:0;right:0}
+  /* Container pour les chips - positionnement absolu avec tracks */
+  td.slot .slot-content{position:relative;min-height:30px}
   td.today{background:var(--today)} td.weekend{background:var(--offday)}
   td.slot.dragover{background:#26405e;outline:2px dashed var(--s-planned);outline-offset:-2px}
   tbody tr:nth-child(even) td.name{background:#12181f}
   tbody tr.row-unassigned td{background:#191f2a;border-bottom:2px solid var(--s-planned)}
   tbody tr.row-unassigned td.name{background:#1d2533}
 
-  .chip,.chip-prio{display:block;border-radius:3px;padding:2px 6px 2px 8px;
-    font-size:8px;line-height:1.2;font-weight:500;color:#0d1117;
-    cursor:grab;user-select:none;margin-bottom:2px;white-space:nowrap}
-  /* Dans la grille : hauteur fixe pour les tracks, texte dépasse si besoin */
-  .slot-content .chip,.slot-content .chip-prio{height:17px;margin-bottom:0;overflow:visible}
+  .chip,.chip-prio{display:block;border-radius:3px;padding:4px 8px 4px 10px;
+    font-size:11px;line-height:1.3;font-weight:500;color:#0d1117;
+    cursor:grab;user-select:none;margin-bottom:2px}
+  /* Dans la grille : positionnement absolu par track */
+  .slot-content .chip,.slot-content .chip-prio{position:absolute;left:2px;right:2px;margin:0}
   .chip:hover,.chip-prio:hover{outline:2px solid rgba(255,255,255,.5)}
   .chip.dragging,.chip-prio.dragging{opacity:.4}
-  .chip.cont,.chip-prio.cont{opacity:.85;border-radius:0;margin-left:-3px;margin-right:-3px;padding-left:6px}
+  /* Continuation : statut visible, nom et boutons cachés */
+  .chip.cont,.chip-prio.cont{opacity:.9;border-radius:0;left:-1px;right:-1px;padding:4px 8px}
+  .chip.cont .cname,.chip-prio.cont .cname,
+  .chip.cont .chip-buttons,.chip-prio.cont .chip-buttons{display:none}
   .chip.cont .pbar,.chip-prio.cont .pbar{display:none}
   .chip .pbar,.chip-prio .pbar{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
   .chip .prio,.chip-prio .prio{display:inline-block;width:7px;height:7px;border-radius:50%;
     margin-right:4px;vertical-align:0;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
   .chip .cname,.chip-prio .cname{font-weight:600;pointer-events:none}
-  .chip small,.chip-prio small{display:block;font-size:7px;opacity:.72;font-weight:600;pointer-events:none}
-  /* Contre-zoom du texte seulement dans la grille */
-  .slot-content .chip .cname,.slot-content .chip-prio .cname{
-    display:inline-block;transform:scale(var(--text-scale));transform-origin:left center}
-  .slot-content .chip small,.slot-content .chip-prio small{
-    transform:scale(var(--text-scale));transform-origin:left center}
+  .chip small,.chip-prio small{display:block;font-size:9px;opacity:.72;font-weight:600;pointer-events:none}
+  .slot-content .chip .cname,.slot-content .chip-prio .cname{display:inline-block}
   .chip .grip,.chip-prio .grip{position:absolute;top:0;bottom:0;width:13px;cursor:ew-resize;z-index:3;
     display:flex;align-items:center;justify-content:center;
     background:rgba(0,0,0,.20);opacity:.6;transition:opacity .12s,background .12s}
@@ -116,7 +112,6 @@
   /* Boutons au-dessus des chips */
   .chip-buttons{position:absolute;left:0;bottom:100%;margin-bottom:2px;
     display:flex;gap:3px;opacity:0;transition:opacity .15s;z-index:10}
-  .slot-content .chip-buttons{transform:scale(var(--text-scale));transform-origin:left bottom}
   .chip:hover .chip-buttons,.chip-prio:hover .chip-buttons{opacity:1}
   .mark-done-btn{background:#2d5a3d;color:#fff;border:none;border-radius:3px;padding:3px 6px;
     font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.4)}
@@ -142,10 +137,10 @@
     border-right:none;border-radius:6px 0 0 6px;cursor:pointer;
     display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--ink);z-index:5}
   .toggle-sidebar:hover{background:var(--head)}
-  .unplanned{width:180px;flex:none;background:var(--panel);border-left:1px solid var(--grid);
-    overflow:auto;padding:8px}
-  .unplanned h2{font-size:12px;text-transform:uppercase;letter-spacing:.6px;
-    color:var(--ink-dim);margin-bottom:8px}
+  .unplanned{width:260px;flex:none;background:var(--panel);border-left:2px solid var(--s-planned);
+    overflow:auto;padding:12px}
+  .unplanned h2{font-size:14px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--ink);margin-bottom:10px;font-weight:700}
   .unplanned.dragover{outline:2px dashed var(--s-planned);outline-offset:-4px}
   .unplanned .chip,.unplanned .chip-prio{cursor:grab}
   .sort-btns{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}
@@ -627,7 +622,17 @@ function sortUnplanned(list){
   return cpy;
 }
 
-const TRACK_HEIGHT=18; // hauteur d'un track en pixels
+// Estime la hauteur d'une chip en fonction du texte (nom + statut)
+// Basé sur ~10 caractères par ligne dans une cellule étroite, font 11px, line-height 1.3
+function estimateChipHeight(task){
+  const charsPerLine=12; // estimation pour une cellule de grille
+  const lineHeight=14; // 11px * 1.3
+  const padding=10; // padding vertical total
+  const nameLines=Math.ceil((task.name||"").length/charsPerLine);
+  const statusLines=task.status?Math.ceil(task.status.length/charsPerLine):0;
+  return Math.max(28, (nameLines+statusLines)*lineHeight+padding);
+}
+
 function chipHTML(t,opts){
   opts=opts||{};
   const pc=PRIO[t.priority]?PRIO[t.priority][1]:"#d0d0d0";
@@ -643,9 +648,10 @@ function chipHTML(t,opts){
   </span>`:"";
   // Couleur toujours basée sur la priorité
   const textColor=["var(--p-sail)","var(--p-when)","var(--p-nice)"].includes(pc)?"color:#0d1117;":"";
-  // Position verticale basée sur le track
-  const trackTop=(opts.track||0)*TRACK_HEIGHT;
-  const posStyle=`style="background:${pc};${textColor}top:${trackTop}px"`;
+  // Positionnement absolu avec top et height
+  const topPx=opts.top||0;
+  const heightPx=opts.height||"auto";
+  const posStyle=`style="background:${pc};${textColor}top:${topPx}px;height:${heightPx}px"`;
   return `<span class="chip-prio${opts.cont?' cont':''}${localDoneClass}" ${posStyle} draggable="true"
     data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
     ${grips}${buttons}<span class="cname">${esc(t.name)}</span>`+
@@ -716,29 +722,45 @@ function render(){
   for(const person of rows){
     const isUnassigned=(person===UNASSIGNED);
     const personDaysOff=getDaysOff(person,weekStart);
-    // Calcule le nombre max de tracks pour cette personne cette semaine
     const personTracks=tracksByPerson[person]||{};
-    const maxTrack=Math.max(0,...Object.values(personTracks));
-    const rowHeight=(maxTrack+1)*TRACK_HEIGHT;
+
+    // Calcule la hauteur max par track pour cette personne
+    const personTasks=ITEMS.filter(it=>rowKeyOf(it.person)===person&&it.start);
+    const trackHeights={}; // track -> max height
+    for(const task of personTasks){
+      const track=personTracks[task.id]||0;
+      const h=estimateChipHeight(task);
+      trackHeights[track]=Math.max(trackHeights[track]||0,h);
+    }
+    // Calcule les positions top cumulées pour chaque track
+    const trackTops={}; // track -> top position
+    const sortedTracks=Object.keys(trackHeights).map(Number).sort((a,b)=>a-b);
+    let cumTop=2; // padding initial
+    for(const track of sortedTracks){
+      trackTops[track]=cumTop;
+      cumTop+=trackHeights[track]+2; // +2 pour espacement
+    }
+    const totalRowHeight=Math.max(30,cumTop);
+
     html+=`<tr${isUnassigned?' class="row-unassigned"':''}><td class="name" data-person="${esc(person)}"${isUnassigned?' style="color:var(--s-planned);font-style:italic;cursor:default"':''}><span>${esc(person)}</span></td>`;
     days.forEach((d,i)=>{
-      // i: 0=Lun, 1=Mar, ... 6=Dim dans notre affichage
-      // Convertir en jour JS: Lun=1, Mar=2, ... Dim=0
-      const jsDow=(i+1)%7; // 0=Lun->1, 6=Dim->0
+      const jsDow=(i+1)%7;
       const isDayOff=personDaysOff.has(jsDow);
       const isSat=i===5,isSun=i===6,we=isSat||isSun,td=dayIso[i]===todayIso;
       ["AM","PM"].forEach(half=>{
         const cellTasks=byCell[person+"||"+slotKey(dayIso[i],half)]||[];
-        // Trie par track pour un affichage stable
         cellTasks.sort((a,b)=>a.track-b.track);
         let inner="";
-        // N'affiche pas les chips si c'est un jour off pour cette personne
         if(!isDayOff){
-          for(const ct of cellTasks)
-            inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd,track:ct.track});
+          for(const ct of cellTasks){
+            const track=ct.track;
+            const top=trackTops[track]||0;
+            const height=trackHeights[track]||28;
+            inner+=chipHTML(ct.task,{cont:!ct.isStart,gripL:ct.isStart,gripR:ct.isEnd,top,height});
+          }
         }
         html+=`<td class="slot ${half==='AM'?'am':'pm'} ${we?'weekend':''} ${td?'today':''} ${isDayOff?'day-off':''}"
-          data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}"><div class="slot-content" style="height:${rowHeight}px">${inner}</div></td>`;
+          data-person="${esc(person)}" data-date="${dayIso[i]}" data-half="${half}"><div class="slot-content" style="height:${totalRowHeight}px">${inner}</div></td>`;
       });
     });
     html+="</tr>";
@@ -783,11 +805,8 @@ function applyZoom(){
   if(!slider||!table)return;
   const zoomPct=parseInt(slider.value,10);
   const zoom=zoomPct/100;
-  // Zoom CSS sur le tableau entier
+  // Zoom CSS sur le tableau entier (tout est zoomé ensemble)
   table.style.zoom=String(zoom);
-  // Contre-zoom sur le texte pour garder la même taille
-  const textScale=1/zoom;
-  document.documentElement.style.setProperty('--text-scale',textScale);
   if(label)label.textContent=zoomPct+"%";
 }
 function adjustRowHeights(){applyZoom();}
