@@ -15,6 +15,7 @@
     --p-dock:#e63946; --p-sail:#ff6b35; --p-when:#f7b538;
     --p-nice:#7ec8e3; --p-hold:#b0b0b0;
     --font:"Inter","Segoe UI",system-ui,sans-serif;
+    --name-width:120px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
@@ -42,7 +43,7 @@
   thead th{position:sticky;top:0;z-index:3;background:var(--head);
     padding:4px 2px;font-size:11px;font-weight:600;text-align:center}
   thead th .th-text,thead th .dow{display:inline-block}
-  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:8px;width:100px}
+  thead th.namecol{z-index:4;left:0;text-align:left;padding-left:8px;width:var(--name-width);min-width:var(--name-width);max-width:var(--name-width)}
   thead th.namecol .th-text{transform-origin:left center}
   thead th .dow{display:block;font-size:11px;color:var(--ink-dim);font-weight:500}
   thead th.today{background:var(--today);color:#fff}
@@ -53,7 +54,7 @@
   thead th.day-col{border-left:2px solid #3d4a5c}
   thead th.ampm.am{border-left:2px solid #3d4a5c}
   td.name{position:sticky;left:0;z-index:2;background:var(--panel);
-    font-weight:600;font-size:11px;padding:4px 6px;width:100px;cursor:pointer;vertical-align:middle}
+    font-weight:600;font-size:11px;padding:4px 6px;width:var(--name-width);min-width:var(--name-width);max-width:var(--name-width);cursor:pointer;vertical-align:middle}
   td.name span{display:inline-block}
   td.name:hover{background:var(--head)}
   td.slot.day-off{background:#2d1f1f !important}
@@ -805,8 +806,11 @@ function applyZoom(){
   if(!slider||!table)return;
   const zoomPct=parseInt(slider.value,10);
   const zoom=zoomPct/100;
-  // Zoom CSS sur le tableau entier (tout est zoomé ensemble)
+  // Zoom CSS sur le tableau entier - tout scale ensemble proportionnellement
   table.style.zoom=String(zoom);
+  // Colonne Name : largeur fixe visuellement (120px apparent)
+  const nameWidth = 120 / zoom;
+  document.documentElement.style.setProperty('--name-width', nameWidth + 'px');
   if(label)label.textContent=zoomPct+"%";
 }
 function adjustRowHeights(){applyZoom();}
