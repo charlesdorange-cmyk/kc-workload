@@ -542,23 +542,13 @@ function demoUnplanned(){
 /* ===================== NORMALISATION API ===================== */
 function normalize(apiItems){
   const planned=[],unplanned=[];RAW={};
-  const now=new Date();
-  const today=now.toISOString().slice(0,10);
-  const currentHour=now.getHours();
+  const today=new Date().toISOString().slice(0,10);
 
-  // Vérifie si la timeline d'une tâche est complètement passée (et pas Done)
+  // Vérifie si la timeline est passée : fin strictement avant aujourd'hui (et pas Done)
   function isOverdue(end, endHour, status){
     if(!end) return false;
     if(status==="Done") return false;
-    if(end<today) return true;
-    if(end===today){
-      if(endHour){
-        const h=parseInt(endHour.split(":")[0],10)||18;
-        return currentHour>=h;
-      }
-      return currentHour>=18; // Par défaut 18h
-    }
-    return false;
+    return end<today; // Overdue si fin < aujourd'hui (hier ou avant)
   }
 
   for(const it of apiItems){
