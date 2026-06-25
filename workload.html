@@ -125,6 +125,11 @@
   /* Local Done indicator */
   .chip.local-done,.chip-prio.local-done{outline:2px solid #00c875;outline-offset:-2px}
   .local-done .mark-done-btn{background:#00c875}
+  /* Overdue indicator (tâche en retard) */
+  .chip.overdue,.chip-prio.overdue{outline:2px solid #e2445c;outline-offset:-2px}
+  .overdue-badge{display:inline-block;background:#e2445c;color:#fff;font-weight:700;
+    font-size:10px;width:14px;height:14px;line-height:14px;text-align:center;
+    border-radius:50%;margin-right:4px;flex-shrink:0}
   .s-working{background:var(--s-working)} .s-done{background:var(--s-done)}
   .s-stuck{background:var(--s-stuck);color:#fff} .s-check{background:var(--s-check)}
   .s-planned{background:var(--s-planned);color:#fff} .s-toplan{background:#2b76e5;color:#fff}
@@ -537,6 +542,25 @@ function demoUnplanned(){
 /* ===================== NORMALISATION API ===================== */
 function normalize(apiItems){
   const planned=[],unplanned=[];RAW={};
+  const now=new Date();
+  const today=now.toISOString().slice(0,10);
+  const currentHour=now.getHours();
+
+  // Vérifie si la timeline d'une tâche est complètement passée (et pas Done)
+  function isOverdue(end, endHour, status){
+    if(!end) return false;
+    if(status==="Done") return false;
+    if(end<today) return true;
+    if(end===today){
+      if(endHour){
+        const h=parseInt(endHour.split(":")[0],10)||18;
+        return currentHour>=h;
+      }
+      return currentHour>=18; // Par défaut 18h
+    }
+    return false;
+  }
+
   for(const it of apiItems){
     const cv=it.column_values||{};
     const get=k=>{const v=cv[k];return v==null?"":(typeof v==="string"?v:(v.text||""));};
@@ -564,7 +588,10 @@ function normalize(apiItems){
       // sans personne -> ligne virtuelle "Non attribué" (person:null).
       const startHalf=halfFromHour(startHour,true);
       const endHalf=halfFromHour(endHour,false);
-      if(labels.length){
+      // Si timeline passée et pas Done → retour au backlog
+      if(isOverdue(end||start, endHour, status)){
+        unplanned.push({...base,person:labels[0]||null,overdue:true});
+      }else if(labels.length){
         for(const p of labels)
           planned.push({...base,person:p,start,end:end||start,startHalf,endHalf});
       }else{
@@ -642,12 +669,12 @@ function chipHTML(t,opts){
   const isScheduled=!!t.start;
   const localDone=isLocalDone(t.id);
   const localDoneClass=localDone?" local-done":"";
+  const overdueClass=t.overdue?" overdue":"";
   const grips=(opts.gripL?`<span class="grip l" data-grip="l"></span>`:"")
             +(opts.gripR?`<span class="grip r" data-grip="r"></span>`:"");
-  // Boutons visibles seulement si planifié et pas en continuation
+  // Bouton Done visible seulement si planifié et pas en continuation
   const buttons=(isScheduled && !opts.cont)?`<span class="chip-buttons">
-    <button class="mark-done-btn" data-mark="${t.id}">${localDone?'Undo':'Done'}</button>
-    <button class="done-btn" data-done="${t.id}">Archive</button>
+    <button class="done-btn" data-done="${t.id}">Done</button>
   </span>`:"";
   // Couleur toujours basée sur la priorité
   const textColor=["var(--p-sail)","var(--p-when)","var(--p-nice)"].includes(pc)?"color:#0d1117;":"";
@@ -655,9 +682,10 @@ function chipHTML(t,opts){
   const topPx=opts.top||0;
   const heightPx=opts.height||"auto";
   const posStyle=`style="background:${pc};${textColor}top:${topPx}px;height:${heightPx}px"`;
-  return `<span class="chip-prio${opts.cont?' cont':''}${localDoneClass}" ${posStyle} draggable="true"
-    data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}">
-    ${grips}${buttons}<span class="cname">${esc(t.name)}</span>`+
+  const overdueIndicator=t.overdue?`<span class="overdue-badge">!</span>`:"";
+  return `<span class="chip-prio${opts.cont?' cont':''}${localDoneClass}${overdueClass}" ${posStyle} draggable="true"
+    data-id="${t.id}" title="${esc(t.name)} — ${esc(t.priority||'')}${t.overdue?' (En retard)':''}">
+    ${grips}${buttons}${overdueIndicator}<span class="cname">${esc(t.name)}</span>`+
     (t.status?`<small>${esc(t.status)}</small>`:"")+`</span>`;
 }
 
@@ -771,8 +799,8 @@ function render(){
   html+="</tbody>";
   document.getElementById("grid").innerHTML=html;
 
-  // Backlog : toutes les tâches non planifiées sauf Aborted
-  let filtered=UNPLANNED.filter(t=>t.status!=="Aborted");
+  // Backlog : toutes les tâches non planifiées sauf Aborted et Done
+  let filtered=UNPLANNED.filter(t=>t.status!=="Aborted" && t.status!=="Done");
   // Filtres département et statut
   if(backlogDeptFilter) filtered=filtered.filter(t=>t.department===backlogDeptFilter);
   if(backlogStatusFilter) filtered=filtered.filter(t=>t.status===backlogStatusFilter);
@@ -902,9 +930,6 @@ function openPanel(id){
   const files=(det.files&&det.files.length)
     ?`<div class="files">${det.files.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">📎 ${esc(f.name)}</a>`).join("")}</div>`
     :'<p class="none">No files</p>';
-  // Bouton local done
-  const localDoneActive=isLocalDone(id);
-  const localDoneBtn=`<button class="toggle-local-done" style="background:${localDoneActive?'#00c875':'#2d5a3d'};color:#fff;border:none;border-radius:5px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px">${localDoneActive?'✓ Done':'Done'}</button>`;
   const statusBtns=STATUS_OPTIONS.map(s=>{
     const active=(s===it.status)?" active":"";
     const wht=['Stuck','Standby','Testing & Validation','Sailors validation','Planned'].includes(s)?'color:#fff;':'';
@@ -923,7 +948,6 @@ function openPanel(id){
     day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"
   }):"—";
   document.getElementById("p-body").innerHTML=`
-    ${localDoneBtn}
     <h3>Status (Monday) — click to change</h3><div class="statusgrid">${statusBtns}</div>
     <h3>Priority — click to change</h3><div class="statusgrid">${prioBtns}</div>
     <h3>Description</h3>${det.description?`<div class="txt">${esc(det.description)}</div>`:'<p class="none">—</p>'}
@@ -931,7 +955,6 @@ function openPanel(id){
     <h3>How we fixed it?</h3>${det.how?`<div class="txt">${esc(det.how)}</div>`:'<p class="none">—</p>'}
     <h3>Attached files</h3>${files}
     <h3>Monday</h3>${mondaySection}`;
-  document.querySelector(".toggle-local-done").onclick=()=>{toggleLocalDone(id);openPanel(id);};
   document.querySelectorAll(".set-status").forEach(b=>b.onclick=()=>changeStatus(b.dataset.label));
   document.querySelectorAll(".set-prio").forEach(b=>b.onclick=()=>changePriority(b.dataset.label));
   document.getElementById("scrim").classList.add("open");
@@ -964,15 +987,7 @@ document.addEventListener("keydown",e=>{
   }
 });
 
-/* ===================== BOUTON MARK DONE (local indicator) ===================== */
-document.addEventListener("click",e=>{
-  const btn=e.target.closest(".mark-done-btn");
-  if(!btn)return;
-  e.stopPropagation();e.preventDefault();
-  toggleLocalDone(btn.dataset.mark);
-});
-
-/* ===================== BOUTON ARCHIVE ===================== */
+/* ===================== BOUTON DONE (change status + bordure verte) ===================== */
 document.addEventListener("click",async e=>{
   const btn=e.target.closest(".done-btn");
   if(!btn)return;
@@ -980,36 +995,36 @@ document.addEventListener("click",async e=>{
   const id=btn.dataset.done;
   const it=findTask(id);
   if(!it)return;
-  // Confirmation
-  if(!confirm(`Archive "${it.name}"?`))return;
-  // Local Event — pas de sync
+  // Ajoute la bordure verte immédiatement
+  const chip=btn.closest(".chip-prio,.chip");
+  if(chip)chip.classList.add("local-done");
+  // Local Event — update status locally
   if(it.isLocal||String(id).startsWith("local_")){
-    removeLocalEvent(id);
-    ITEMS=ITEMS.filter(x=>String(x.id)!==String(id));
-    render();toast("Event archived");
+    it.status="Done";
+    updateLocalEvent(id,{status:"Done"});
+    render();toast("Done ✓");
     return;
   }
   // Mode démo
   if(usingDemo){
-    ITEMS=ITEMS.filter(x=>x.id!==id);
-    render();toast("Demo: task archived");
+    it.status="Done";
+    render();toast("Done ✓");
     return;
   }
-  // Appel API
+  // Appel API pour changer le statut en Done
   btn.disabled=true;btn.textContent="...";
   try{
     const r=await fetch(CONFIG.workerUrl+"/status",{method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({itemId:Number(id),label:"Done"})});
     if(!r.ok)throw new Error(await r.text());
-    // Succès : retirer la tâche du dashboard
-    ITEMS=ITEMS.filter(x=>x.id!==id);
-    UNPLANNED=UNPLANNED.filter(x=>x.id!==id);
-    render();toast("Task archived ✓");
+    // Succès : mettre à jour le statut localement (la tâche reste visible)
+    it.status="Done";
+    render();toast("Done ✓");
   }catch(err){
     console.error("Done error:",err);
     toast("Error: "+err.message);
-    btn.disabled=false;btn.textContent="Archive";
+    btn.disabled=false;btn.textContent="Done";
   }
 });
 
@@ -1449,6 +1464,7 @@ async function applySchedule(it,person,startSlot,endSlot){
   it.start=from;it.end=to;
   it.startHalf=startSlot.half;it.endHalf=endSlot.half;
   it.status=newStatus;
+  delete it.overdue; // retire le flag si re-planifié depuis backlog
   if(UNPLANNED.includes(it)){UNPLANNED=UNPLANNED.filter(x=>x!==it);ITEMS.push(it);}
   render();
 
